@@ -51,7 +51,7 @@ window.mediaManager.onLoad = function(event) {
     'mediaElement': window.mediaElement
   });
   host.processMetadata = function(type,data,timestamp) {
-    console.log('process meta: '+type+ ' ' +data +' '+timestamp);
+    console.log('process meta type: '+type+ ' data ' +data +' timestamp '+timestamp);
   }
   // When MPL is used, buffering status should be detected by
   // getState()['underflow]'
@@ -59,6 +59,7 @@ window.mediaManager.onLoad = function(event) {
   //window.mediaElement.removeEventListener('stalled', this.onBuffering_);
   //window.mediaElement.removeEventListener('waiting', this.onBuffering_);
   castPlayer = new cast.player.api.Player(host);
+  console.log('receiver: loading url '+url);
   castPlayer.load(protocolFunc(host), Infinity);
   
   
