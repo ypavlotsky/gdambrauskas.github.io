@@ -45,6 +45,7 @@ window.mediaManager.onLoad = function(event) {
   var url = 'http://gvabox.com/html5/sanils/mock_preroll/playlist.m3u8';//info.message.media.contentId;
   url = 'http://www.gvabox.com/truman/media/star_trek/master_dec.m3u8';
   url = 'http://gvabox.com/html5/sanils/mock_live/playlist.m3u8';
+  url = 'http://gvabox.com/html5/sanils/ssai/mock_preroll/playlist.m3u8';
   console.log('loadVideo_: using MPL');
   var host = new cast.player.api.Host({
     'url': url,
