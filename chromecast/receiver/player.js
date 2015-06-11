@@ -23,6 +23,10 @@ function onPlay() {
   // Now buffering ends.
 }
 
+window.mediaManager = new cast.receiver.MediaManager(window.mediaElement);
+window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+
+
 window.castReceiverManager.onSenderDisconnected = function() {
   window.close();
 }
@@ -141,6 +145,4 @@ function onContentResumeRequested() {
   origOnLoad(origOnLoadEvent);
 }
 
-window.mediaManager = new cast.receiver.MediaManager(window.mediaElement);
-window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 window.castReceiverManager.start();
