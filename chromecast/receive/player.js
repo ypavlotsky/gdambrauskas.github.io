@@ -52,7 +52,7 @@
  */
 var sampleplayer = sampleplayer || {};
 
-
+console.log('gvd receiver: player script loaded');
 
 /**
  * <p>
