@@ -1,0 +1,280 @@
+<html >
+<body>
+  <script type="text/javascript">
+  console.log(String.fromCharCode(73, 68, 51, 4, 0, 0, 0, 0, 0, 41, 84, 88, 88, 88, 0, 0, 0, 31,
+        0, 0, 3, 0, 109, 100, 105, 97, 108, 111, 103, 95, 86, 73, 78, 68, 73, 67, 79, 49, 53, 50,
+        55, 54, 54, 52, 95, 115, 116, 97, 114, 116, 0));
+  var arr = new Uint8Array([73, 68, 51, 4, 0, 0, 0, 0, 0, 41, 84, 88, 88, 88, 0, 0, 0, 31,
+        0, 0, 3, 0, 109, 100, 105, 97, 108, 111, 103, 95, 86, 73, 78, 68, 73, 67, 79, 49, 53, 50,
+        55, 54, 54, 52, 95, 115, 116, 97, 114, 116, 0]);
+  
+    var ID3_TEXT_ENCODING_ISO_8859_1 = 0;
+  var ID3_TEXT_ENCODING_UTF_16 = 1;
+  var ID3_TEXT_ENCODING_UTF_16BE = 2;
+  var ID3_TEXT_ENCODING_UTF_8 = 3;
+  
+  var data = arr;
+  var dataView = new DataView(data.buffer);
+  var position = 0;
+  var limit;
+
+/**
+ * Converts a UTF-8 byte array to JavaScript's 16-bit Unicode.
+ * @param {Uint8Array|Array<number>} bytes UTF-8 byte array.
+ * @return {string} 16-bit Unicode string.
+ */
+utf8ByteArrayToString = function(bytes) {
+  // TODO(pupius): Use native implementations if/when available
+  var out = [], pos = 0, c = 0;
+  while (pos < bytes.length) {
+    var c1 = bytes[pos++];
+    if (c1 < 128) {
+      out[c++] = String.fromCharCode(c1);
+    } else if (c1 > 191 && c1 < 224) {
+      var c2 = bytes[pos++];
+      out[c++] = String.fromCharCode((c1 & 31) << 6 | c2 & 63);
+    } else {
+      var c2 = bytes[pos++];
+      var c3 = bytes[pos++];
+      out[c++] = String.fromCharCode(
+          (c1 & 15) << 12 | (c2 & 63) << 6 | c3 & 63);
+    }
+  }
+  return out.join('');
+};
+  
+  /**
+   * Moves the reading offset by {@code bytes}.
+   *
+   * @throws IllegalArgumentException Thrown if the new position is neither in nor at the end of the
+   *     array.
+   */
+  function skipBytes(skipNumberOfBytes) {
+    setPosition(position + skipNumberOfBytes);
+  }
+  
+  /**
+   * Sets the reading offset in the array.
+   *
+   * @param position Byte offset in the array from which to read.
+   * @throws IllegalArgumentException Thrown if the new position is neither in nor at the end of the
+   *     array.
+   */
+  function setPosition(newPosition) {
+    if (position < 0 || position > limit) {
+      throw new Error("Invalid read");
+    }
+    position = newPosition;
+  }
+  
+  /**
+   * Reads the next {@code length} bytes into {@code buffer} at {@code offset}.
+   *
+   * @see System#arraycopy
+   */
+  function readBytes(readNumberOfBytes) {
+    var buffer = data.buffer.slice(position, position + readNumberOfBytes);
+    position += readNumberOfBytes;
+    return buffer;
+  }
+  
+  /**
+   * Reads a Synchsafe integer.
+   * <p>
+   * Synchsafe integers keep the highest bit of every byte zeroed. A 32 bit synchsafe integer can
+   * store 28 bits of information.
+   *
+   * @return The parsed value.
+   */
+  function readSynchSafeInt32() {
+    var b1 = dataView.getUint8(position++);
+    var b2 = dataView.getUint8(position++);
+    var b3 = dataView.getUint8(position++);
+    var b4 = dataView.getUint8(position++);
+    return (b1 << 21) | (b2 << 14) | (b3 << 7) | b4;
+  }
+  
+  
+  var id3Size = parseId3Header();
+  
+  while (id3Size > 0) {
+    var frameId = String.fromCharCode(dataView.getUint8(position++)) +
+        String.fromCharCode(dataView.getUint8(position++)) +
+        String.fromCharCode(dataView.getUint8(position++)) +
+        String.fromCharCode(dataView.getUint8(position++));
+    var frameSize = readSynchSafeInt32();
+    if (frameSize <= 1) {
+      break;
+    }
+    // Skip frame flags.
+    skipBytes(2);
+    if ('TXXX' == frameId) {
+      var encoding = dataView.getUint8(position++);
+      var frameDataView = new DataView(readBytes(frameSize - 1));
+      
+      // frame has description and value.
+      var firstTerminatingNullIndex = indexOfTerminatingNull(frameDataView, 0, encoding);
+      var description = readString(frameDataView, 0, firstTerminatingNullIndex,  encoding);
+      log("description "+description)
+      var value = readString(frameDataView, firstTerminatingNullIndex, frameDataView.byteLength,  encoding);
+      log("value "+value)
+    } else {
+      // Don't care about other tags.
+      skipBytes(frameSize - 1); 
+    }
+    id3Size -= frameSize + 10 /* header size */;
+  }
+
+function indexOfTerminatingNull(view, startIndex, encodingByte) {
+  switch (encoding) {
+    case ID3_TEXT_ENCODING_ISO_8859_1:
+    case ID3_TEXT_ENCODING_UTF_8:
+      return indexOfTerminatingNull(view, startIndex);
+      
+    case ID3_TEXT_ENCODING_UTF_16:
+    case ID3_TEXT_ENCODING_UTF_16BE:
+      return indexOfTerminatingNullUTF16(view, startIndex);
+      
+    default:
+      return -1;
+  }
+}
+
+function readString(view, startIndex, terminatorIndex, encoding) {
+  switch (encoding) {
+    case ID3_TEXT_ENCODING_ISO_8859_1:
+      return readNullTerminatedString(view, startIndex);
+
+    case ID3_TEXT_ENCODING_UTF_16:
+    case ID3_TEXT_ENCODING_UTF_16BE:
+      return readNullTerminatedStringUTF16(view, startIndex);
+
+    case ID3_TEXT_ENCODING_UTF_8:
+      return utf8ByteArrayToString(new Uint8Array(view.buffer.slice(startIndex, terminatorIndex)));
+       
+    default: 
+      return '';
+  }
+};
+
+//javascript/closure/crypt/crypt.js
+/*
+goog.require('goog.crypt');
+obff.common.Reader.prototype.readUtf8String = function(byteCount) {
+  if (byteCount == null || byteCount < 0) {
+    throw Error('Could not read UTF-8 String: Byte count was not provided.');
+  }
+  if (byteCount == 0) {
+    return '';
+  }
+  var bytes = this.readUint8Array(byteCount);
+  return goog.crypt.utf8ByteArrayToString(bytes);
+};
+*/
+
+
+/**
+ * Read as a sequence of characters, returning them as a single string.
+ *
+ * This is a static utility function.  There is a member function with the
+ * same name which side-effects the current read position.
+ *
+ * @param {DataView} dataView Data view instance.
+ * @param {number} pos Position in bytes to read from.
+ * @param {number} size Number of bytes to read.
+ * @param {number=} opt_end Maximum position to read from.
+ * @return {string} Read string.
+ */
+function readNullTerminatedString(view) {
+  var code;
+  var codes = [];
+  
+  for (var i = 0; i < view.byteLength; i++) {
+    code = view.getUint8(i);
+    if (code == 0) {
+      break;
+    }
+    codes.push(code);
+  }
+  return String.fromCharCode.apply(null, codes).join('');
+};
+
+function indexOfTerminatingNull(view, startIndex) {
+  for (var i = startIndex; i < view.byteLength; i++) {
+    if (view.getUint8(i) == 0) {
+      return i;
+    }
+  }
+  return -1;
+};
+
+function readNullTerminatedStringUTF16(view, startIndex) {
+  var code;
+  var codes = [];
+
+  for (var i = startIndex; i < view.byteLength; i +=2) {
+    var code = dataView.getUint16(pos + i);
+    if (code == 0) break;
+    codes.push(code);
+  }
+
+  return String.fromCharCode.apply(null, codes);
+};
+
+function indexOfTerminatingNullUTF16(view, startIndex) {
+  for (var i = startIndex; i < view.byteLength; i++) {
+    if (view.getUint16(i) == 0) {
+      return i;
+    }
+  }
+  return -1;
+};
+
+function readNullTerminatedString(){
+  var str = "";
+  for(var ch = String.fromCharCode(data[position++]);
+      ch[0] != '\0';
+      ch = String.fromCharCode(data[position++])) {
+        str += ch;
+      }
+  return str;
+};
+  
+  function parseId3Header() {
+    var id1 = String.fromCharCode(dataView.getUint8(position++));
+    var id2 = String.fromCharCode(dataView.getUint8(position++));
+    var id3 = String.fromCharCode(dataView.getUint8(position++));
+    if (id1 != 'I' || id2 != 'D' || id3 != '3') {
+      throw Error("Unexpected ID3 file identifier");
+    }
+    
+    skipBytes(2); // Skip version.
+
+    flags = dataView.getUint8(position++);
+    
+    var id3Size = readSynchSafeInt32();
+    
+    // Check if extended header is present.
+    if ((flags & 0x2) != 0) {
+      var extendedHeaderSize = readSynchSafeInt32();
+      if (extendedHeaderSize > 4) {
+        skipBytes(extendedHeaderSize - 4);
+      }
+      id3Size -= extendedHeaderSize;
+    }
+
+    // Check if footer presents.
+    if ((flags & 0x8) != 0) {
+      id3Size -= 10;
+    }
+    return id3Size;
+  }
+  
+  function log(msg) {
+    console.log(msg);
+  }
+  
+  
+  </script>
+</body>
+</html>

@@ -1,9 +1,12 @@
 <!--
 Copyright (C) 2014 Google Inc. All Rights Reserved.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
      http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +32,7 @@ html, body, #wrapper {
 input {
   font-family: "Arial", Arial, sans-serif;
   font-size: 40px;
-  font-weight: bold;  
+  font-weight: bold;	
 }
 .border {
     border: 2px solid #cccccc;
@@ -41,17 +44,27 @@ input {
     box-shadow: 0 0 5px #8ecaed;
 }
 </style>
+<script>
+window['__onGCastApiAvailable'] = function(loaded, errorInfo) {
+  if (loaded) {
+    initializeCastApi();
+  } else {
+    console.log(errorInfo);
+  }
+}
+</script>
+
 <script type="text/javascript" src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
 <script type="text/javascript">
-var applicationID = '4D8EA828'; // gvd '51F38556';
-var namespace = 'urn:x-cast:com.google.cast.sample.helloworld';
+var applicationID = '4D8EA828'; //truman
+//applicationID = '74CCDBF5'; // ima
+//applicationID = '1DE885F3'; // hello
+//applicationID = '9B5017D3'; // hls
+//applicationID = '51F38556'; // echo
+
+
 var session = null;
-/**
- * Call initialization for Cast
- */
-if (!chrome.cast || !chrome.cast.isAvailable) {
-  setTimeout(initializeCastApi, 1000);
-}
+
 /**
  * initialization
  */
@@ -60,32 +73,31 @@ function initializeCastApi() {
   var apiConfig = new chrome.cast.ApiConfig(sessionRequest,
     sessionListener,
     receiverListener);
-  chrome.cast.initialize(apiConfig, onInitSuccess, onError);
+
+  chrome.cast.initialize(apiConfig, onInitSuccess, onInitError);
 };
+
 /**
  * initialization success callback
  */
 function onInitSuccess() {
   appendMessage("onInitSuccess");
 }
+
 /**
  * initialization error callback
  */
-function onError(message) {
+function onInitError(message) {
   appendMessage("onError: "+JSON.stringify(message));
 }
-/**
- * generic success callback
- */
-function onSuccess(message) {
-  appendMessage("onSuccess: "+message);
-}
+
 /**
  * callback on success for stopping app
  */
 function onStopAppSuccess() {
   appendMessage('onStopAppSuccess');
 }
+
 /**
  * session listener during initialization
  */
@@ -93,8 +105,41 @@ function sessionListener(e) {
   appendMessage('New session ID:' + e.sessionId);
   session = e;
   session.addUpdateListener(sessionUpdateListener);  
-  session.addMessageListener(namespace, receiverMessage);
+  sendMediaToReceiver();
 }
+
+/**
+ * Loads media into a running receiver application
+ * @param {Number} mediaIndex An index number to indicate current media content
+ */
+function sendMediaToReceiver() {
+  if (!session) {
+    appendMessage("no session");
+    return;
+  }
+  appendMessage("media loading...");
+  var mediaInfo = new chrome.cast.media.MediaInfo('http://clips.vorwaerts-gmbh.de/VfE_html5.mp4');
+
+  mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+  mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
+  mediaInfo.contentType = 'video/mp4';
+
+  mediaInfo.metadata.title = 'bunny title';
+
+  var request = new chrome.cast.media.LoadRequest(mediaInfo);
+  request.currentTime = 0;
+
+  session.loadMedia(request,
+    function(obj){
+	    appendMessage("media load success");
+	},
+	function(obj){
+		appendMessage("media load failed");
+	});
+
+
+};
+
 /**
  * listener for session updates
  */
@@ -106,14 +151,7 @@ function sessionUpdateListener(isAlive) {
     session = null;
   }
 };
-/**
- * utility function to log messages from the receiver
- * @param {string} namespace The namespace of the message
- * @param {string} message A message string
- */
-function receiverMessage(namespace, message) {
-  appendMessage("receiverMessage: "+namespace+", "+message);
-};
+
 /**
  * receiver listener during initialization
  */
@@ -125,28 +163,14 @@ function receiverListener(e) {
     appendMessage("receiver list empty");
   }
 }
+
 /**
  * stop app/session
  */
 function stopApp() {
   session.stop(onStopAppSuccess, onError);
 }
-/**
- * send a message to the receiver using the custom namespace
- * receiver CastMessageBus message handler will be invoked
- * @param {string} message A message string
- */
-function sendMessage(message) {
-  if (session!=null) {
-    // gvd session.sendMessage(namespace, message, onSuccess.bind(this, "Message sent: " + message), onError);
-  }
-  else {
-    chrome.cast.requestSession(function(e) {
-        session = e;
-        session.sendMessage(namespace, message, onSuccess.bind(this, "Message sent: " + message), onError);
-      }, onError);
-  }
-}
+
 /**
  * append message to debug message window
  * @param {string} message A message string
@@ -156,31 +180,38 @@ function appendMessage(message) {
   var dw = document.getElementById("debugmessage");
   dw.innerHTML += '\n' + JSON.stringify(message);
 };
+
 /**
  * utility function to handle text typed in by user in the input field
  */
 function update() {
-  sendMessage(document.getElementById("input").value);
+  chrome.cast.requestSession(
+    function(e) {session = e;},
+    function(error){
+      console.log(JSON.stringify(error)) 
+    });
 }
+
 /**
  * handler for the transcribed text from the speech input
  * @param {string} words A transcibed speech string
  */
 function transcribe(words) {
-  sendMessage(words);
+  
 }
+
 </script>
 </head>
 <body>
   <table id="wrapper">
-  <tr>
-    <td>
-      <form method="get" action="JavaScript:update();">
-        <input id="input" class="border" type="text" size="30" onwebkitspeechchange="transcribe(this.value)" x-webkit-speech/>
-      </form>
-    </td>
-  </tr>
-  </table>  
+	<tr>
+		<td>
+			<form method="get" action="JavaScript:update();">
+				<input id="input" class="border" type="text" size="30" onwebkitspeechchange="transcribe(this.value)" x-webkit-speech/>
+			</form>
+		</td>
+	</tr>
+  </table>	
 
   <!-- Debbugging output -->
   <div style="margin:10px; visibility:hidden;">
