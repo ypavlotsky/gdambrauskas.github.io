@@ -52,8 +52,6 @@
  */
 var sampleplayer = sampleplayer || {};
 
-console.log('gvd receiver: player script loaded');
-
 /**
  * <p>
  * Cast player constructor - This does the following:
@@ -616,6 +614,7 @@ sampleplayer.CastPlayer.prototype.load = function(info) {
   var media = info.message.media || {};
   var contentType = media.contentType;
   var playerType = sampleplayer.getType_(media);
+  console.log("gvd info "+info.customData)
   var isLiveStream = media.streamType === cast.receiver.media.StreamType.LIVE;
   if (!media.contentId) {
     this.log_('Load failed: no content');
