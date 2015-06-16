@@ -612,9 +612,9 @@ sampleplayer.CastPlayer.prototype.load = function(info) {
   clearTimeout(this.idleTimerId_);
   var self = this;
   var media = info.message.media || {};
+  console.log("gvd info "+media.customData)
   var contentType = media.contentType;
-  var playerType = sampleplayer.getType_(media);
-  console.log("gvd info "+info.customData)
+  var playerType = sampleplayer.getType_(media);  
   var isLiveStream = media.streamType === cast.receiver.media.StreamType.LIVE;
   if (!media.contentId) {
     this.log_('Load failed: no content');
