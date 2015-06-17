@@ -190,7 +190,7 @@ ima.chromecast.TxxxFrameParser.prototype.indexOfTerminatingNullUTF16 = function(
 
 ima.chromecast.TxxxFrameParser.prototype.parseId3Header = function() {
   var tempArr = new Uint8Array(this.dataView.buffer);
-  log("l "+tempArray.length)
+  log("l "+tempArr.length)
   var str = String.fromCharCode.apply(null, tempArr);
   log('string0 '+str)
   log("position "+this.position);
