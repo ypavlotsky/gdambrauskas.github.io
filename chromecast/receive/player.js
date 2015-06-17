@@ -590,8 +590,13 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
     'mediaElement': self.mediaElement_
   });
   host.processMetadata = function(type,data,timestamp) {
+    var debugBytes = [];
+    for (var i = 0; i < data.length; i++) {
+      debugBytes.push(data[i]);
+    }
+    log(debugBytes);
     var parser = new ima.chromecast.TxxxFrameParser(data);
-    parser.parse();
+    parser.parse();    
   }
   host.onError = function() {
     self.preloadPlayer_.unload();
@@ -837,6 +842,11 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         'mediaElement': this.mediaElement_
       });
       host.processMetadata = function(type,data,timestamp) {
+        var debugBytes = [];
+        for (var i = 0; i < data.length; i++) {
+          debugBytes.push(data[i]);
+        }
+        log(debugBytes);
         var parser = new ima.chromecast.TxxxFrameParser(data);
         parser.parse();
       }
@@ -1006,6 +1016,12 @@ sampleplayer.CastPlayer.prototype.processTtmlCues_ =
         'mediaElement': this.mediaElement_
       });
       host.processMetadata = function(type,data,timestamp) {
+        var debugBytes = [];
+        for (var i = 0; i < data.length; i++) {
+          debugBytes.push(data[i]);
+        }
+        log(debugBytes);
+        
         var parser = new ima.chromecast.TxxxFrameParser(data);
         parser.parse();
       }
