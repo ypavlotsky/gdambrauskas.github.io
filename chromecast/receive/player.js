@@ -48,11 +48,11 @@
 
 function processMetadata(type,data,timestamp) { // gvd
   var debugBytes = [];
-//  for (var i = 0; i < data.length; i++) {
-//    debugBytes.push(data[i]);
-//  }
-//  log(debugBytes);
-//  log(String.fromCharCode.apply(null, debugBytes).join(''));
+  for (var i = 0; i < data.length; i++) {
+    debugBytes.push(data[i]);
+  }
+  log(debugBytes);
+  log(String.fromCharCode.apply(null, debugBytes).join(''));
 //  var parser = new ima.chromecast.TxxxFrameParser(data);
 //  parser.parse();   
 }
