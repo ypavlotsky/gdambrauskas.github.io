@@ -52,7 +52,7 @@ function processMetadata(type,data,timestamp) { // gvd
     debugBytes.push(data[i]);
   }
   log(debugBytes);
-  //log(String.fromCharCode.apply(null, debugBytes).join(''));
+  log(String.fromCharCode.apply(null, debugBytes).join(''));
 //  var parser = new ima.chromecast.TxxxFrameParser(data);
 //  parser.parse();   
 }
