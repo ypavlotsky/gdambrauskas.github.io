@@ -192,7 +192,7 @@ ima.chromecast.TxxxFrameParser.prototype.parseId3Header = function() {
   var byte1 = String.fromCharCode(this.dataView.getUint8(this.position++));
   var byte2 = String.fromCharCode(this.dataView.getUint8(this.position++));
   var byte3 = String.fromCharCode(this.dataView.getUint8(this.position++));
-  log(byte1 + " " + byte2 + " " +byte3)
+  log("3 codes " + byte1 + " " + byte2 + " " +byte3)
   if (byte1 != 'I' || byte2 != 'D' || byte3 != '3') {
     throw Error("Unexpected ID3 file identifier");
   }

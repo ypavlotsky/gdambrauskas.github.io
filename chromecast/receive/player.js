@@ -46,6 +46,16 @@
 
 'use strict';
 
+function processMetadata(type,data,timestamp) { // gvd
+  var debugBytes = [];
+  for (var i = 0; i < data.length; i++) {
+    debugBytes.push(data[i]);
+  }
+  log(debugBytes);
+  log(String.fromCharCode.apply(null, debugBytes).join(''));
+  var parser = new ima.chromecast.TxxxFrameParser(data);
+  parser.parse();   
+}
 
 /**
  * Creates the namespace
@@ -589,15 +599,7 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
     'url': url,
     'mediaElement': self.mediaElement_
   });
-  host.processMetadata = function(type,data,timestamp) {
-    var debugBytes = [];
-    for (var i = 0; i < data.length; i++) {
-      debugBytes.push(data[i]);
-    }
-    log(debugBytes);
-    var parser = new ima.chromecast.TxxxFrameParser(data);
-    parser.parse();    
-  }
+  host.processMetadata = processMetadata;
   host.onError = function() {
     self.preloadPlayer_.unload();
     self.preloadPlayer_ = null;
@@ -841,15 +843,7 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         'url': url,
         'mediaElement': this.mediaElement_
       });
-      host.processMetadata = function(type,data,timestamp) {
-        var debugBytes = [];
-        for (var i = 0; i < data.length; i++) {
-          debugBytes.push(data[i]);
-        }
-        log(debugBytes);
-        var parser = new ima.chromecast.TxxxFrameParser(data);
-        parser.parse();
-      }
+      host.processMetadata = processMetadata;
       host.onError = loadErrorCallback;
       this.player_ = new cast.player.api.Player(host);
       this.player_.load(protocolFunc(host));
@@ -1015,16 +1009,7 @@ sampleplayer.CastPlayer.prototype.processTtmlCues_ =
         'url': '',
         'mediaElement': this.mediaElement_
       });
-      host.processMetadata = function(type,data,timestamp) {
-        var debugBytes = [];
-        for (var i = 0; i < data.length; i++) {
-          debugBytes.push(data[i]);
-        }
-        log(debugBytes);
-        
-        var parser = new ima.chromecast.TxxxFrameParser(data);
-        parser.parse();
-      }
+      host.processMetadata = processMetadata;
       this.protocol_ = null;
       this.player_ = new cast.player.api.Player(host);
     }
