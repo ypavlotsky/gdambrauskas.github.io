@@ -54,8 +54,8 @@ function processMetadata(type,data,timestamp) { // gvd
   log(debugBytes);
   var str = String.fromCharCode.apply(null, data);
   log('string '+str)
-//  var parser = new ima.chromecast.TxxxFrameParser(data);
-//  parser.parse();   
+  var parser = new ima.chromecast.TxxxFrameParser(data);
+  parser.parse();   
 }
 
 /**
