@@ -589,6 +589,11 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
     'url': url,
     'mediaElement': self.mediaElement_
   });
+  host.processMetadata = function(type,data,timestamp) {
+    console.log('process meta type: '+type+ ' data ' +data +' timestamp '+timestamp);
+    var str = String.fromCharCode.apply(null, data);
+    console.log('string '+str)
+  }
   host.onError = function() {
     self.preloadPlayer_.unload();
     self.preloadPlayer_ = null;
@@ -832,6 +837,11 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         'url': url,
         'mediaElement': this.mediaElement_
       });
+      host.processMetadata = function(type,data,timestamp) {
+        console.log('process meta type: '+type+ ' data ' +data +' timestamp '+timestamp);
+        var str = String.fromCharCode.apply(null, data);
+        console.log('string '+str)
+      }
       host.onError = loadErrorCallback;
       this.player_ = new cast.player.api.Player(host);
       this.player_.load(protocolFunc(host));
@@ -997,6 +1007,11 @@ sampleplayer.CastPlayer.prototype.processTtmlCues_ =
         'url': '',
         'mediaElement': this.mediaElement_
       });
+      host.processMetadata = function(type,data,timestamp) {
+        console.log('process meta type: '+type+ ' data ' +data +' timestamp '+timestamp);
+        var str = String.fromCharCode.apply(null, data);
+        console.log('string '+str)
+      }
       this.protocol_ = null;
       this.player_ = new cast.player.api.Player(host);
     }
