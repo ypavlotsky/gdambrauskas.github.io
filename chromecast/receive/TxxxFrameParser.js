@@ -45,6 +45,9 @@ ima = {};
 ima.chromecast = {};
 
 ima.chromecast.TxxxFrameParser = function(data/*Uint8Array*/) {
+  var str = String.fromCharCode.apply(null, data);
+  log('string '+str)
+  
   this.data = data;
   this.dataView = new DataView(data.buffer);
   

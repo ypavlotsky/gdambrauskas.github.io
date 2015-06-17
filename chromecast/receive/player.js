@@ -46,19 +46,12 @@
 
 'use strict';
 
-var littleEndian = (function() {
-  var buffer = new ArrayBuffer(2);
-  new DataView(buffer).setInt16(0, 256, true);
-  return new Int16Array(buffer)[0] === 256;
-})();
-console.log(littleEndian); // true or false
-
-var byteData = new Uint8Array([73,68,51,4,0,0,0,0,0,25,84,88,88,88,0,0,0,15,0,0,3,0,103,111,111,103,108,101,95,48,48,48,49,49,0]);
-var byteDataView = new DataView(byteData.buffer);
-var c1 = String.fromCharCode(byteDataView.getUint8(0));
-var c2 = String.fromCharCode(byteDataView.getUint8(1));
-var c3 = String.fromCharCode(byteDataView.getUint8(2));
-log("cs "+c1)
+//var byteData = new Uint8Array([73,68,51,4,0,0,0,0,0,25,84,88,88,88,0,0,0,15,0,0,3,0,103,111,111,103,108,101,95,48,48,48,49,49,0]);
+//var byteDataView = new DataView(byteData.buffer);
+//var c1 = String.fromCharCode(byteDataView.getUint8(0));
+//var c2 = String.fromCharCode(byteDataView.getUint8(1));
+//var c3 = String.fromCharCode(byteDataView.getUint8(2));
+//log("cs "+c1)
 
 function processMetadata(type,data,timestamp) { // gvd
   var debugBytes = [];
@@ -66,8 +59,6 @@ function processMetadata(type,data,timestamp) { // gvd
     debugBytes.push(data[i]);
   }
   log(debugBytes);
-  var str = String.fromCharCode.apply(null, data);
-  log('string '+str)
   var parser = new ima.chromecast.TxxxFrameParser(data);
   parser.parse();   
 }
