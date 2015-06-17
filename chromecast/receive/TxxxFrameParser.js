@@ -189,6 +189,7 @@ ima.chromecast.TxxxFrameParser.prototype.indexOfTerminatingNullUTF16 = function(
 };
 
 ima.chromecast.TxxxFrameParser.prototype.parseId3Header = function() {
+  log("position "+this.position);
   var byte1 = String.fromCharCode(this.dataView.getUint8(this.position++));
   var byte2 = String.fromCharCode(this.dataView.getUint8(this.position++));
   var byte3 = String.fromCharCode(this.dataView.getUint8(this.position++));
