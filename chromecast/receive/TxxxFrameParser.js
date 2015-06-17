@@ -47,6 +47,13 @@ ima.chromecast = {};
 ima.chromecast.TxxxFrameParser = function(data/*Uint8Array*/) {
   this.data = data;
   this.dataView = new DataView(data.buffer);
+  
+  var byteDataView = new DataView(data.buffer);
+  var c1 = String.fromCharCode(byteDataView.getUint8(0));
+  var c2 = String.fromCharCode(byteDataView.getUint8(1));
+  var c3 = String.fromCharCode(byteDataView.getUint8(2));
+  log("cs0 "+c1)
+  
   this.position = 0;
   this.limit = data.length;
 }
