@@ -62,6 +62,9 @@ ima.chromecast.TxxxFrameParser = function(data/*Uint8Array*/) {
   var testView = new DataView(input.buffer);  
   var b11 = testView.getUint8(0);
   log("b11 "+b11+ " "+String.fromCharCode(b11))
+  b11 = this.dataView.getUint8(0);
+  log("b11 "+b11+ " "+String.fromCharCode(b11))
+  
   
   var c2 = String.fromCharCode(byteDataView.getUint8(1));
   var c3 = String.fromCharCode(byteDataView.getUint8(2));
