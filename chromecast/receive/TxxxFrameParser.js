@@ -45,35 +45,7 @@ ima = {};
 ima.chromecast = {};
 
 ima.chromecast.TxxxFrameParser = function(data/*Uint8Array*/) {
-  var str = String.fromCharCode.apply(null, data);
-  log('string '+str)
-  
   this.data = data;
-  this.dataView = new DataView(data.buffer);
-  
-  var byteDataView = new DataView(data.buffer);
-  var c1 = String.fromCharCode(byteDataView.getUint8(0));
-  
-  var array = new Uint8Array(data.buffer);  
-  log("buffer size "+data.buffer.byteLength +" data length "+ data.length + " array size "+array.length)
-  
-  str = String.fromCharCode.apply(null, array);
-  log('string from buff '+str)
-  var c11 = this.data[0] & 0xFF;
-  var c12 = byteDataView.getUint8(0);
-  log("compare " + c11 + " " + c12);
-  
-  var input = new Uint8Array([73,68,51,4,0,0,0,0,0,25,84,88,88,88,0,0,0,15,0,0,3,0,103,111,111,103,108,101,95,48,48,48,49,49,0]);  
-  var testView = new DataView(input.buffer);  
-  var b11 = testView.getUint8(0);
-  log("b11 "+b11+ " "+String.fromCharCode(b11))
-  b11 = this.dataView.getUint8(0);
-  log("b11 "+b11+ " "+String.fromCharCode(b11))
-  
-  
-  var c2 = String.fromCharCode(byteDataView.getUint8(1));
-  var c3 = String.fromCharCode(byteDataView.getUint8(2));
-  log("cs0 "+c1)
   
   this.position = 0;
   this.limit = data.length;
@@ -94,15 +66,20 @@ ima.chromecast.TxxxFrameParser.prototype.skipBytes = function(skipNumberOfBytes)
   this.setPosition(this.position + skipNumberOfBytes);
 }
 
+/** Reads the next byte as an unsigned value. */
+ima.chromecast.TxxxFrameParser.prototype.readUnsignedByte = function() {
+  return this.data[this.position++] & 0xFF;
+}
+
 ima.chromecast.TxxxFrameParser.prototype.parse = function() {
 
   var id3Size = this.parseId3Header();
   
   while (id3Size > 0) {
-    var byte1 = this.dataView.getUint8(this.position++);
-    var byte2 = this.dataView.getUint8(this.position++);
-    var byte3 = this.dataView.getUint8(this.position++);
-    var byte4 = this.dataView.getUint8(this.position++);
+    var byte1 = this.readUnsignedByte();
+    var byte2 = this.readUnsignedByte();
+    var byte3 = this.readUnsignedByte();
+    var byte4 = this.readUnsignedByte();
     var frameId = String.fromCharCode(byte1) + String.fromCharCode(byte2) + String.fromCharCode(byte3) + String.fromCharCode(byte4);
     var frameSize = this.readSynchSafeInt32();
     if (frameSize <= 1) {
@@ -217,14 +194,11 @@ ima.chromecast.TxxxFrameParser.prototype.indexOfTerminatingNullUTF16 = function(
 };
 
 ima.chromecast.TxxxFrameParser.prototype.parseId3Header = function() {
-  var str = String.fromCharCode.apply(null, this.data);
-  log('string0 '+str)
-  log("position "+this.position);
-  var byte1 = String.fromCharCode(this.dataView.getUint8(this.position++));
-  var byte2 = String.fromCharCode(this.dataView.getUint8(this.position++));
-  var byte3 = String.fromCharCode(this.dataView.getUint8(this.position++));
-  log("3 codes " + byte1 + " " + byte2 + " " +byte3)
-  if (byte1 != 'I' || byte2 != 'D' || byte3 != '3') {
+  var byte1 = this.readUnsignedByte();
+  var byte2 = this.readUnsignedByte();
+  var byte3 = this.readUnsignedByte();
+  var identifier = String.fromCharCode(byte1) + String.fromCharCode(byte2) + String.fromCharCode(byte3);
+  if ('ID3' != identifier) {
     throw Error("Unexpected ID3 file identifier");
   }
   
