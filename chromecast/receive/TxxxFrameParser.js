@@ -88,7 +88,7 @@ ima.chromecast.TxxxFrameParser.prototype.parse = function() {
     // Skip frame flags.
     this.skipBytes(2);
     if ('TXXX' == frameId) {
-      var encoding = this.dataView.getUint8(this.position++);
+      var encoding = this.readUnsignedByte();
       var frameDataView = new DataView(this.readBytes(frameSize - 1));
       
       // frame has description and value.
@@ -138,10 +138,10 @@ ima.chromecast.TxxxFrameParser.prototype.readBytes = function(bytesCount) {
  * @return The parsed value.
  */
 ima.chromecast.TxxxFrameParser.prototype.readSynchSafeInt32 = function() {
-  var byte1 = this.dataView.getUint8(this.position++);
-  var byte2 = this.dataView.getUint8(this.position++);
-  var byte3 = this.dataView.getUint8(this.position++);
-  var byte4 = this.dataView.getUint8(this.position++);
+  var byte1 = this.readUnsignedByte();
+  var byte2 = this.readUnsignedByte();
+  var byte3 = this.readUnsignedByte();
+  var byte4 = this.readUnsignedByte();
   return (byte1 << 21) | (byte2 << 14) | (byte3 << 7) | byte4;
 }
 
@@ -202,10 +202,11 @@ ima.chromecast.TxxxFrameParser.prototype.parseId3Header = function() {
     throw Error("Unexpected ID3 file identifier");
   }
   
-  // Skip version, this parser handles version that truman produces.
+  // Skip version, this parser handles version that our ad insertion system
+  // produces.
   this.skipBytes(2);
 
-  var flags = this.dataView.getUint8(this.position++);
+  var flags = this.readUnsignedByte();
   
   var id3Size = this.readSynchSafeInt32();
   
