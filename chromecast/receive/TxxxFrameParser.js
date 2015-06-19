@@ -89,7 +89,7 @@ ima.chromecast.TxxxFrameParser.prototype.parse = function() {
     this.skipBytes(2);
     if ('TXXX' == frameId) {
       var encoding = this.readUnsignedByte();
-      var frameDataView = new DataView(this.readBytes(frameSize - 1));
+      var frameDataView = new DataView(this.readBytes(frameSize - 1).buffer);
       
       // frame has description and value.
       var firstTerminatingNullIndex = this.indexOfTerminatingNull(frameDataView, 0, encoding);
@@ -141,9 +141,10 @@ ima.chromecast.TxxxFrameParser.prototype.readBytes = function(bytesCount) {
   }
   console.log("s: "+s)
   // gvd
-  var buffer = this.data.buffer.slice(this.position, this.position + bytesCount);
-  this.position += bytesCount;
-  return buffer;
+//  var buffer = this.data.buffer.slice(this.position, this.position + bytesCount);
+//  this.position += bytesCount;
+//  return buffer;
+  return read;
 }
 
 /**
