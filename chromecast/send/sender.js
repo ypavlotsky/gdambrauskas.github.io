@@ -1,18 +1,3 @@
-// Copyright 2014 Google Inc. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
 (function() {
   'use strict';
 
@@ -51,7 +36,6 @@ var PLAYER_STATE = {
   'PLAYING' : 'PLAYING',
   'PAUSED' : 'PAUSED',
   'STOPPED' : 'STOPPED',
-  'SEEKING' : 'SEEKING',
   'ERROR' : 'ERROR'
 };
 
@@ -91,10 +75,6 @@ var CastPlayer = function() {
   /* Local player variables */
   // @type {PLAYER_STATE} A state for local media player
   this.localPlayerState = PLAYER_STATE.IDLE;
-  // @type {HTMLElement} local player
-  this.localPlayer = null;
-  // @type {Boolean} Fullscreen mode on/off
-  this.fullscreen = false;
 
   /* Current media variables */
   // @type {Boolean} Audio on and off
@@ -116,15 +96,6 @@ var CastPlayer = function() {
   this.mediaContents = null;
 
   this.initializeCastPlayer();
-  this.initializeLocalPlayer();
-};
-
-/**
- * Initialize local media player 
- */
-CastPlayer.prototype.initializeLocalPlayer = function() {
-  this.localPlayer = document.getElementById('video_element');
-  this.localPlayer.addEventListener('loadeddata', this.onMediaLoadedLocally.bind(this));
 };
 
 /**
@@ -142,7 +113,8 @@ CastPlayer.prototype.initializeCastPlayer = function() {
   // default set to the default media receiver app ID
   // optional: you may change it to point to your own
   //var applicationID = chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID;
-  var applicationID = '4F8B3483';
+  var applicationID = 'BC48F4DE';
+  //var applicationID = '4D8EA828';
 
   // auto join policy can be one of the following three
   var autoJoinPolicy = chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED;
@@ -158,7 +130,7 @@ CastPlayer.prototype.initializeCastPlayer = function() {
 
   chrome.cast.initialize(apiConfig, this.onInitSuccess.bind(this), this.onError.bind(this));
 
-  this.addVideoThumbs();
+  this.addVideos();
   this.initializeUI();
 };
 
@@ -166,7 +138,7 @@ CastPlayer.prototype.initializeCastPlayer = function() {
  * Callback function for init success 
  */
 CastPlayer.prototype.onInitSuccess = function() {
-  console.log("init success");
+  console.log('init success');
   this.updateMediaControlUI();
 };
 
@@ -174,7 +146,7 @@ CastPlayer.prototype.onInitSuccess = function() {
  * Generic error callback function 
  */
 CastPlayer.prototype.onError = function() {
-  console.log("error");
+  console.log('error');
 };
 
 /**
@@ -221,10 +193,10 @@ CastPlayer.prototype.receiverListener = function(e) {
   if( e === 'available' ) {
     this.receivers_available = true;
     this.updateMediaControlUI();
-    console.log("receiver found");
+    console.log('receiver found');
   }
   else {
-    console.log("receiver list empty");
+    console.log('receiver list empty');
   }
 };
 
@@ -239,14 +211,6 @@ CastPlayer.prototype.sessionUpdateListener = function(isAlive) {
     this.currentMediaSession = null;
     clearInterval(this.timer);
     this.updateDisplayMessage();
-
-    var online = navigator.onLine;
-    if( online == true ) {
-      // continue to play media locally
-      console.log("current time: " + this.currentMediaTime);
-      this.playMediaLocally();
-      this.updateMediaControlUI();
-    }
   }
 };
 
@@ -256,12 +220,12 @@ CastPlayer.prototype.sessionUpdateListener = function(isAlive) {
  * @param {Number} mediaIndex A number for media index 
  */
 CastPlayer.prototype.selectMedia = function(mediaIndex) {
-  console.log("media selected" + mediaIndex);
+  console.log('media selected' + mediaIndex);
 
   this.currentMediaIndex = mediaIndex;
   // reset progress bar
-  var pi = document.getElementById("progress_indicator"); 
-  var p = document.getElementById("progress"); 
+  var pi = document.getElementById('progress_indicator'); 
+  var p = document.getElementById('progress'); 
 
   // reset currentMediaTime
   this.currentMediaTime = 0;
@@ -271,7 +235,6 @@ CastPlayer.prototype.selectMedia = function(mediaIndex) {
 
   if( !this.currentMediaSession ) {
     this.localPlayerState = PLAYER_STATE.IDLE;
-    this.playMediaLocally();
   }
   else {
     this.castPlayerState = PLAYER_STATE.IDLE;
@@ -286,7 +249,7 @@ CastPlayer.prototype.selectMedia = function(mediaIndex) {
  * session request in opt_sessionRequest. 
  */
 CastPlayer.prototype.launchApp = function() {
-  console.log("launching app...");
+  console.log('launching app...');
   chrome.cast.requestSession(
     this.sessionListener.bind(this),
     this.onLaunchError.bind(this));
@@ -300,7 +263,7 @@ CastPlayer.prototype.launchApp = function() {
  * @param {Object} e A chrome.cast.Session object
  */
 CastPlayer.prototype.onRequestSessionSuccess = function(e) {
-  console.log("session success: " + e.sessionId);
+  console.log('session success: ' + e.sessionId);
   this.session = e;
   this.deviceState = DEVICE_STATE.ACTIVE;
   this.updateMediaControlUI();
@@ -312,7 +275,7 @@ CastPlayer.prototype.onRequestSessionSuccess = function(e) {
  * Callback function for launch error
  */
 CastPlayer.prototype.onLaunchError = function() {
-  console.log("launch error");
+  console.log('launch error');
   this.deviceState = DEVICE_STATE.ERROR;
 };
 
@@ -335,10 +298,6 @@ CastPlayer.prototype.onStopAppSuccess = function(message) {
   this.currentMediaSession = null;
   clearInterval(this.timer);
   this.updateDisplayMessage();
-
-  // continue to play media locally
-  console.log("current time: " + this.currentMediaTime);
-  this.playMediaLocally();
   this.updateMediaControlUI();
 };
 
@@ -348,24 +307,25 @@ CastPlayer.prototype.onStopAppSuccess = function(message) {
  */
 CastPlayer.prototype.loadMedia = function(mediaIndex) {
   if (!this.session) {
-    console.log("no session");
+    console.log('no session');
     return;
   }
-  console.log("loading..." + this.mediaContents[mediaIndex]['title']);
-  var mediaInfo = new chrome.cast.media.MediaInfo(this.mediaContents[mediaIndex]['sources'][0]);
+  // extract media stuff here gvd
+  var mediaInfo = new chrome.cast.media.MediaInfo('http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8');
+  mediaInfo.customData = {foo:1};
 
   mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
   mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
+  
+  //gvd contentType:mimeType // For HLS: "application/x-mpegurl"
+  
   mediaInfo.contentType = 'video/mp4';
 
-  mediaInfo.metadata.title = this.mediaContents[mediaIndex]['title'];
-  mediaInfo.metadata.images = [{'url': MEDIA_SOURCE_ROOT + this.mediaContents[mediaIndex]['thumb']}];
 
   var request = new chrome.cast.media.LoadRequest(mediaInfo);
   request.autoplay = this.autoplay;
   if( this.localPlayerState == PLAYER_STATE.PLAYING ) {
     request.currentTime = this.localPlayer.currentTime;
-    this.localPlayer.pause();
     this.localPlayerState = PLAYER_STATE.STOPPED;
   }
   else {
@@ -377,10 +337,6 @@ CastPlayer.prototype.loadMedia = function(mediaIndex) {
     this.onMediaDiscovered.bind(this, 'loadMedia'),
     this.onLoadMediaError.bind(this));
 
-  document.getElementById("media_title").innerHTML = this.mediaContents[this.currentMediaIndex]['title'];
-  document.getElementById("media_subtitle").innerHTML = this.mediaContents[this.currentMediaIndex]['subtitle'];
-  document.getElementById("media_desc").innerHTML = this.mediaContents[this.currentMediaIndex]['description'];
-
 };
 
 /**
@@ -388,7 +344,7 @@ CastPlayer.prototype.loadMedia = function(mediaIndex) {
  * @param {Object} mediaSession A new media object.
  */
 CastPlayer.prototype.onMediaDiscovered = function(how, mediaSession) {
-  console.log("new media session ID:" + mediaSession.mediaSessionId + ' (' + how + ')');
+  console.log('new media session ID:' + mediaSession.mediaSessionId + ' (' + how + ')');
   this.currentMediaSession = mediaSession;
   if( how == 'loadMedia' ) {
     if( this.autoplay ) {
@@ -418,23 +374,20 @@ CastPlayer.prototype.onMediaDiscovered = function(how, mediaSession) {
   var min = parseInt(duration/60);
   var sec = parseInt(duration % 60);
   if ( hr > 0 ) {
-    duration = hr + ":" + min + ":" + sec;
+    duration = hr + ':' + min + ':' + sec;
   }
   else {
     if( min > 0 ) {
-      duration = min + ":" + sec;
+      duration = min + ':' + sec;
     }
     else {
       duration = sec;
     }
   }
-  document.getElementById("duration").innerHTML = duration;
+  document.getElementById('duration').innerHTML = duration;
 
   if( this.localPlayerState == PLAYER_STATE.PLAYING ) {
     this.localPlayerState == PLAYER_STATE.STOPPED;
-    var vi = document.getElementById('video_image')
-    vi.style.display = 'block';
-    this.localPlayer.style.display = 'none';
     // start progress timer
     this.startProgressTimer(this.incrementMediaTime);
   }
@@ -447,7 +400,7 @@ CastPlayer.prototype.onMediaDiscovered = function(how, mediaSession) {
  * Callback function when media load returns error 
  */
 CastPlayer.prototype.onLoadMediaError = function(e) {
-  console.log("media error");
+  console.log('media error');
   this.castPlayerState = PLAYER_STATE.IDLE;
   // update UIs
   this.updateMediaControlUI();
@@ -463,15 +416,14 @@ CastPlayer.prototype.onMediaStatusUpdate = function(e) {
     this.currentMediaTime = 0;
     this.castPlayerState = PLAYER_STATE.IDLE;
   }
-  console.log("updating media");
+  console.log('updating media');
   this.updateProgressBar(e);
   this.updateDisplayMessage();
   this.updateMediaControlUI();
 };
 
 /**
- * Helper function
- * Increment media current position by 1 second 
+ * Increment media current position by 1 second. 
  */
 CastPlayer.prototype.incrementMediaTime = function() {
   if( this.castPlayerState == PLAYER_STATE.PLAYING || this.localPlayerState == PLAYER_STATE.PLAYING ) {
@@ -487,61 +439,11 @@ CastPlayer.prototype.incrementMediaTime = function() {
 };
 
 /**
- * Play media in local player
- */
-CastPlayer.prototype.playMediaLocally = function() {
-  var vi = document.getElementById('video_image')
-  vi.style.display = 'none';
-  this.localPlayer.style.display = 'block';
-  if( this.localPlayerState != PLAYER_STATE.PLAYING && this.localPlayerState != PLAYER_STATE.PAUSED ) { 
-    this.localPlayer.src = this.mediaContents[this.currentMediaIndex]['sources'][0];
-    this.localPlayer.load();
-  }
-  else {
-    this.localPlayer.play();
-    // start progress timer
-    this.startProgressTimer(this.incrementMediaTime);
-  }
-  this.localPlayerState = PLAYER_STATE.PLAYING;
-  this.updateMediaControlUI();
-};
-
-/**
- * Callback when media is loaded in local player 
- */
-CastPlayer.prototype.onMediaLoadedLocally = function() {
-  this.currentMediaDuration = this.localPlayer.duration;
-  var duration = this.currentMediaDuration;
-      
-  var hr = parseInt(duration/3600);
-  duration -= hr * 3600;
-  var min = parseInt(duration/60);
-  var sec = parseInt(duration % 60);
-  if ( hr > 0 ) {
-    duration = hr + ":" + min + ":" + sec;
-  }
-  else {
-    if( min > 0 ) {
-      duration = min + ":" + sec;
-    }
-    else {
-      duration = sec;
-    }
-  }
-  document.getElementById("duration").innerHTML = duration;
-  this.localPlayer.currentTime = this.currentMediaTime;
-
-  this.localPlayer.play();
-  // start progress timer
-  this.startProgressTimer(this.incrementMediaTime);
-};
-
-/**
  * Play media in Cast mode 
  */
 CastPlayer.prototype.playMedia = function() {
+  gvd('CastPlayer.prototype.playMedia')
   if( !this.currentMediaSession ) {
-    this.playMediaLocally();
     return;
   }
 
@@ -550,7 +452,7 @@ CastPlayer.prototype.playMedia = function() {
     case PLAYER_STATE.LOADED:
     case PLAYER_STATE.PAUSED:
       this.currentMediaSession.play(null, 
-        this.mediaCommandSuccessCallback.bind(this,"playing started for " + this.currentMediaSession.sessionId),
+        this.mediaCommandSuccessCallback.bind(this,'playing started for ' + this.currentMediaSession.sessionId),
         this.onError.bind(this));
       this.currentMediaSession.addUpdateListener(this.onMediaStatusUpdate.bind(this));
       this.castPlayerState = PLAYER_STATE.PLAYING;
@@ -583,7 +485,7 @@ CastPlayer.prototype.pauseMedia = function() {
   if( this.castPlayerState == PLAYER_STATE.PLAYING ) {
     this.castPlayerState = PLAYER_STATE.PAUSED;
     this.currentMediaSession.pause(null,
-      this.mediaCommandSuccessCallback.bind(this,"paused " + this.currentMediaSession.sessionId),
+      this.mediaCommandSuccessCallback.bind(this, 'paused ' + this.currentMediaSession.sessionId),
       this.onError.bind(this));
     this.updateMediaControlUI();
     this.updateDisplayMessage();
@@ -595,7 +497,6 @@ CastPlayer.prototype.pauseMedia = function() {
  * Pause media playback in local player 
  */
 CastPlayer.prototype.pauseMediaLocally = function() {
-  this.localPlayer.pause();
   this.localPlayerState = PLAYER_STATE.PAUSED;
   this.updateMediaControlUI();
   clearInterval(this.timer);
@@ -605,13 +506,14 @@ CastPlayer.prototype.pauseMediaLocally = function() {
  * Stop media playback in either Cast or local mode  
  */
 CastPlayer.prototype.stopMedia = function() {
+  gvd('stop media local')
   if( !this.currentMediaSession ) {
     this.stopMediaLocally();
     return;
   }
 
   this.currentMediaSession.stop(null,
-    this.mediaCommandSuccessCallback.bind(this,"stopped " + this.currentMediaSession.sessionId),
+    this.mediaCommandSuccessCallback.bind(this,'stopped ' + this.currentMediaSession.sessionId),
     this.onError.bind(this));
   this.castPlayerState = PLAYER_STATE.STOPPED;
   clearInterval(this.timer);
@@ -624,10 +526,6 @@ CastPlayer.prototype.stopMedia = function() {
  * Stop media playback in local player
  */
 CastPlayer.prototype.stopMediaLocally = function() {
-  var vi = document.getElementById('video_image')
-  vi.style.display = 'block';
-  this.localPlayer.style.display = 'none';
-  this.localPlayer.stop();
   this.localPlayerState = PLAYER_STATE.STOPPED;
   this.updateMediaControlUI();
 };
@@ -637,7 +535,7 @@ CastPlayer.prototype.stopMediaLocally = function() {
  * @param {Boolean} mute A boolean  
  */
 CastPlayer.prototype.setReceiverVolume = function(mute) {
-  var p = document.getElementById("audio_bg_level"); 
+  var p = document.getElementById('audio_bg_level'); 
   if( event.currentTarget.id == 'audio_bg_track' ) {
     var pos = 100 - parseInt(event.offsetY);
   }
@@ -645,7 +543,6 @@ CastPlayer.prototype.setReceiverVolume = function(mute) {
     var pos = parseInt(p.clientHeight) - parseInt(event.offsetY);
   }
   if( !this.currentMediaSession ) {
-      this.localPlayer.volume = pos < 100 ? pos/100 : 1;
       p.style.height = pos + 'px';
       p.style.marginTop = -pos + 'px';
       return;
@@ -691,9 +588,6 @@ CastPlayer.prototype.muteMedia = function() {
     if( this.currentMediaSession ) {
       this.setReceiverVolume(true);
     }
-    else {
-      this.localPlayer.muted = true;
-    }
   }
   else {
     this.audio = true;
@@ -702,71 +596,7 @@ CastPlayer.prototype.muteMedia = function() {
     if( this.currentMediaSession ) {
       this.setReceiverVolume(false);
     }
-    else {
-      this.localPlayer.muted = false;
-    }
   } 
-  this.updateMediaControlUI();
-};
-
-
-/**
- * media seek function in either Cast or local mode
- * @param {Event} e An event object from seek 
- */
-CastPlayer.prototype.seekMedia = function(event) {
-  var pos = parseInt(event.offsetX);
-  var pi = document.getElementById("progress_indicator"); 
-  var p = document.getElementById("progress"); 
-  if( event.currentTarget.id == 'progress_indicator' ) {
-    var curr = parseInt(this.currentMediaTime + this.currentMediaDuration * pos / PROGRESS_BAR_WIDTH);
-    var pp = parseInt(pi.style.marginLeft) + pos;
-    var pw = parseInt(p.style.width) + pos;
-  }
-  else {
-    var curr = parseInt(pos * this.currentMediaDuration / PROGRESS_BAR_WIDTH);
-    var pp = pos -21 - PROGRESS_BAR_WIDTH;
-    var pw = pos;
-  }
-
-  if( this.localPlayerState == PLAYER_STATE.PLAYING || this.localPlayerState == PLAYER_STATE.PAUSED ) {
-    this.localPlayer.currentTime= curr;
-    this.currentMediaTime = curr;
-    this.localPlayer.play();
-  }
-
-  if( this.localPlayerState == PLAYER_STATE.PLAYING || this.localPlayerState == PLAYER_STATE.PAUSED 
-      || this.castPlayerState == PLAYER_STATE.PLAYING || this.castPlayerState == PLAYER_STATE.PAUSED ) {
-    p.style.width = pw + 'px';
-    pi.style.marginLeft = pp + 'px';
-  }
-
-  if( this.castPlayerState != PLAYER_STATE.PLAYING && this.castPlayerState != PLAYER_STATE.PAUSED ) {
-    return;
-  }
-
-  this.currentMediaTime = curr;
-  console.log('Seeking ' + this.currentMediaSession.sessionId + ':' +
-    this.currentMediaSession.mediaSessionId + ' to ' + pos + "%");
-  var request = new chrome.cast.media.SeekRequest();
-  request.currentTime = this.currentMediaTime;
-  this.currentMediaSession.seek(request,
-    this.onSeekSuccess.bind(this, 'media seek done'),
-    this.onError.bind(this));
-  this.castPlayerState = PLAYER_STATE.SEEKING;
-
-  this.updateDisplayMessage();
-  this.updateMediaControlUI();
-};
-
-/**
- * Callback function for seek success
- * @param {String} info A string that describe seek event
- */
-CastPlayer.prototype.onSeekSuccess = function(info) {
-  console.log(info);
-  this.castPlayerState = PLAYER_STATE.PLAYING;
-  this.updateDisplayMessage();
   this.updateMediaControlUI();
 };
 
@@ -782,8 +612,8 @@ CastPlayer.prototype.mediaCommandSuccessCallback = function(info, e) {
  * @param {Object} e An media status update object 
  */
 CastPlayer.prototype.updateProgressBar = function(e) {
-  var p = document.getElementById("progress"); 
-  var pi = document.getElementById("progress_indicator"); 
+  var p = document.getElementById('progress'); 
+  var pi = document.getElementById('progress_indicator'); 
   if( e == false ) {
     p.style.width = '0px';
     pi.style.marginLeft = -21 - PROGRESS_BAR_WIDTH + 'px';
@@ -793,7 +623,7 @@ CastPlayer.prototype.updateProgressBar = function(e) {
   } else {
     p.style.width = Math.ceil(PROGRESS_BAR_WIDTH * this.currentMediaSession.currentTime / this.currentMediaSession.media.duration + 1) + 'px';
     this.progressFlag = false; 
-    setTimeout(this.setProgressFlag.bind(this),1000); // don't update progress in 1 second
+    setTimeout(this.setProgressFlag.bind(this), 1000); // don't update progress in 1 second
     var pp = Math.ceil(PROGRESS_BAR_WIDTH * this.currentMediaSession.currentTime / this.currentMediaSession.media.duration);
     pi.style.marginLeft = -21 - PROGRESS_BAR_WIDTH + pp + 'px';
   }
@@ -808,10 +638,10 @@ CastPlayer.prototype.setProgressFlag = function() {
 };
 
 /**
- * Update progress bar based on timer  
+ * Update progress bar based on timer.
  */
 CastPlayer.prototype.updateProgressBarByTimer = function() {
-  var p = document.getElementById("progress"); 
+  var p = document.getElementById('progress'); 
   if( isNaN(parseInt(p.style.width)) ) {
     p.style.width = 0;
   } 
@@ -822,7 +652,7 @@ CastPlayer.prototype.updateProgressBarByTimer = function() {
   if( this.progressFlag ) { 
     // don't update progress if it's been updated on media status update event
     p.style.width = pp + 'px'; 
-    var pi = document.getElementById("progress_indicator"); 
+    var pi = document.getElementById('progress_indicator'); 
     pi.style.marginLeft = -21 - PROGRESS_BAR_WIDTH + pp + 'px';
   }
 
@@ -840,18 +670,7 @@ CastPlayer.prototype.updateProgressBarByTimer = function() {
  */
 CastPlayer.prototype.updateDisplayMessage = function() {
   if( this.deviceState != DEVICE_STATE.ACTIVE || this.castPlayerState == PLAYER_STATE.IDLE || this.castPlayerState == PLAYER_STATE.STOPPED ) {
-    document.getElementById("playerstate").style.display = 'none';
-    document.getElementById("playerstatebg").style.display = 'none';
-    document.getElementById("play").style.display = 'block';
-    document.getElementById("video_image_overlay").style.display = 'none';
-  }
-  else {
-    document.getElementById("playerstate").style.display = 'block';
-    document.getElementById("playerstatebg").style.display = 'block';
-    document.getElementById("video_image_overlay").style.display = 'block';
-    document.getElementById("playerstate").innerHTML = 
-      this.mediaContents[this.currentMediaIndex]['title'] + " "
-      + this.castPlayerState + " on " + this.session.receiver.friendlyName;
+    document.getElementById('play').style.display = 'block';
   }
 }
 
@@ -860,39 +679,38 @@ CastPlayer.prototype.updateDisplayMessage = function() {
  */
 CastPlayer.prototype.updateMediaControlUI = function() {
   var playerState = this.deviceState == DEVICE_STATE.ACTIVE ? this.castPlayerState : this.localPlayerState;
+  gvd('CastPlayer.prototype.updateMediaControlUI')
   switch ( playerState )
   {
     case PLAYER_STATE.LOADED:
     case PLAYER_STATE.PLAYING:
-      document.getElementById("play").style.display = 'none';
-      document.getElementById("pause").style.display = 'block';
+      document.getElementById('play').style.display = 'none';
+      document.getElementById('pause').style.display = 'block';
       break;
     case PLAYER_STATE.PAUSED:
     case PLAYER_STATE.IDLE:
     case PLAYER_STATE.LOADING:
     case PLAYER_STATE.STOPPED:
-      document.getElementById("play").style.display = 'block';
-      document.getElementById("pause").style.display = 'none';
+      document.getElementById('play').style.display = 'block';
+      document.getElementById('pause').style.display = 'none';
       break;
     default:
       break;
   }
 
   if( !this.receivers_available ) {
-    document.getElementById("casticonactive").style.display = 'none';
-    document.getElementById("casticonidle").style.display = 'none';
+    document.getElementById('casticonactive').style.display = 'none';
+    document.getElementById('casticonidle').style.display = 'none';
     return;
   }
 
   if( this.deviceState == DEVICE_STATE.ACTIVE ) {
-    document.getElementById("casticonactive").style.display = 'block';
-    document.getElementById("casticonidle").style.display = 'none';
-    this.hideFullscreenButton();
+    document.getElementById('casticonactive').style.display = 'block';
+    document.getElementById('casticonidle').style.display = 'none';
   }
   else {
-    document.getElementById("casticonidle").style.display = 'block';
-    document.getElementById("casticonactive").style.display = 'none';
-    this.showFullscreenButton();
+    document.getElementById('casticonidle').style.display = 'block';
+    document.getElementById('casticonactive').style.display = 'none';
   }
 }
 
@@ -901,65 +719,34 @@ CastPlayer.prototype.updateMediaControlUI = function() {
  * @param {Number} mediaIndex An number
  */
 CastPlayer.prototype.selectMediaUpdateUI = function(mediaIndex) {
-  document.getElementById('video_image').src = MEDIA_SOURCE_ROOT + this.mediaContents[mediaIndex]['thumb'];
-  document.getElementById("progress").style.width = '0px';
-  document.getElementById("media_title").innerHTML = this.mediaContents[mediaIndex]['title'];
-  document.getElementById("media_subtitle").innerHTML = this.mediaContents[mediaIndex]['subtitle'];
-  document.getElementById("media_desc").innerHTML = this.mediaContents[mediaIndex]['description'];
+  document.getElementById('progress').style.width = '0px';
 };
 
 /**
  * Initialize UI components and add event listeners 
  */
 CastPlayer.prototype.initializeUI = function() {
-  // set initial values for title, subtitle, and description 
-  document.getElementById("media_title").innerHTML = this.mediaContents[0]['title'];
-  document.getElementById("media_subtitle").innerHTML = this.mediaContents[this.currentMediaIndex]['subtitle'];
-  document.getElementById("media_desc").innerHTML = this.mediaContents[this.currentMediaIndex]['description'];
 
   // add event handlers to UI components
-  document.getElementById("casticonidle").addEventListener('click', this.launchApp.bind(this));
-  document.getElementById("casticonactive").addEventListener('click', this.stopApp.bind(this));
-  document.getElementById("progress_bg").addEventListener('click', this.seekMedia.bind(this));
-  document.getElementById("progress").addEventListener('click', this.seekMedia.bind(this));
-  document.getElementById("progress_indicator").addEventListener('dragend', this.seekMedia.bind(this));
-  document.getElementById("audio_on").addEventListener('click', this.muteMedia.bind(this));
-  document.getElementById("audio_off").addEventListener('click', this.muteMedia.bind(this));
-  document.getElementById("audio_bg").addEventListener('mouseover', this.showVolumeSlider.bind(this));
-  document.getElementById("audio_on").addEventListener('mouseover', this.showVolumeSlider.bind(this));
-  document.getElementById("audio_bg_level").addEventListener('mouseover', this.showVolumeSlider.bind(this));
-  document.getElementById("audio_bg_track").addEventListener('mouseover', this.showVolumeSlider.bind(this));
-  document.getElementById("audio_bg_level").addEventListener('click', this.setReceiverVolume.bind(this, false));
-  document.getElementById("audio_bg_track").addEventListener('click', this.setReceiverVolume.bind(this, false));
-  document.getElementById("audio_bg").addEventListener('mouseout', this.hideVolumeSlider.bind(this));
-  document.getElementById("audio_on").addEventListener('mouseout', this.hideVolumeSlider.bind(this));
-  document.getElementById("media_control").addEventListener('mouseover', this.showMediaControl.bind(this));
-  document.getElementById("media_control").addEventListener('mouseout', this.hideMediaControl.bind(this));
-  document.getElementById("fullscreen_expand").addEventListener('click', this.requestFullScreen.bind(this));
-  document.getElementById("fullscreen_collapse").addEventListener('click', this.cancelFullScreen.bind(this));
-  document.addEventListener("fullscreenchange", this.changeHandler.bind(this), false);      
-  document.addEventListener("webkitfullscreenchange", this.changeHandler.bind(this), false);
+  document.getElementById('casticonidle').addEventListener('click', this.launchApp.bind(this));
+  document.getElementById('casticonactive').addEventListener('click', this.stopApp.bind(this));
+  document.getElementById('audio_on').addEventListener('click', this.muteMedia.bind(this));
+  document.getElementById('audio_off').addEventListener('click', this.muteMedia.bind(this));
+  document.getElementById('audio_bg').addEventListener('mouseover', this.showVolumeSlider.bind(this));
+  document.getElementById('audio_on').addEventListener('mouseover', this.showVolumeSlider.bind(this));
+  document.getElementById('audio_bg_level').addEventListener('mouseover', this.showVolumeSlider.bind(this));
+  document.getElementById('audio_bg_track').addEventListener('mouseover', this.showVolumeSlider.bind(this));
+  document.getElementById('audio_bg_level').addEventListener('click', this.setReceiverVolume.bind(this, false));
+  document.getElementById('audio_bg_track').addEventListener('click', this.setReceiverVolume.bind(this, false));
+  document.getElementById('audio_bg').addEventListener('mouseout', this.hideVolumeSlider.bind(this));
+  document.getElementById('audio_on').addEventListener('mouseout', this.hideVolumeSlider.bind(this));
 
   // enable play/pause buttons
-  document.getElementById("play").addEventListener('click', this.playMedia.bind(this));
-  document.getElementById("pause").addEventListener('click', this.pauseMedia.bind(this));
-  document.getElementById("progress_indicator").draggable = true;
+  document.getElementById('play').addEventListener('click', this.playMedia.bind(this));
+  document.getElementById('pause').addEventListener('click', this.pauseMedia.bind(this));
+  document.getElementById('progress_indicator').draggable = true;
 
 };
-
-/**
- * Show the media control 
- */
-CastPlayer.prototype.showMediaControl = function() {
-  document.getElementById('media_control').style.opacity = 0.7;
-};    
-
-/**
- * Hide the media control  
- */
-CastPlayer.prototype.hideMediaControl = function() {
-  document.getElementById('media_control').style.opacity = 0;
-};    
 
 /**
  * Show the volume slider
@@ -982,67 +769,6 @@ CastPlayer.prototype.hideVolumeSlider = function() {
 };    
 
 /**
- * Request full screen mode 
- */
-CastPlayer.prototype.requestFullScreen = function() {
-  // Supports most browsers and their versions.
-  var element = document.getElementById("video_element");
-  var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen;
-
-  if (requestMethod) { // Native full screen.
-    requestMethod.call(element);
-    console.log("requested fullscreen");
-  }
-};
-
-/**
- * Exit full screen mode 
- */
-CastPlayer.prototype.cancelFullScreen = function() {
-  // Supports most browsers and their versions.
-  var requestMethod = document.cancelFullScreen || document.webkitCancelFullScreen;
-
-  if (requestMethod) { 
-    requestMethod.call(document);
-  } 
-};
-
-/**
- * Exit fullscreen mode by escape 
- */
-CastPlayer.prototype.changeHandler = function(){
-  this.fullscreen = !this.fullscreen;
-  if (this.deviceState == DEVICE_STATE.ACTIVE) {
-    this.hideFullscreenButton();
-  }
-  else {
-    this.showFullscreenButton();
-  }
-};
-
-/**
- * Show expand/collapse fullscreen button
- */
-CastPlayer.prototype.showFullscreenButton = function(){
-  if (this.fullscreen) {
-    document.getElementById('fullscreen_expand').style.display = 'none';
-    document.getElementById('fullscreen_collapse').style.display = 'block';
-  }
-  else {
-    document.getElementById('fullscreen_expand').style.display = 'block';
-    document.getElementById('fullscreen_collapse').style.display = 'none';
-  }
-};
-
-/**
- * Hide expand/collapse fullscreen button
- */
-CastPlayer.prototype.hideFullscreenButton = function(){
-  document.getElementById('fullscreen_expand').style.display = 'none';
-  document.getElementById('fullscreen_collapse').style.display = 'none';
-};
-
-/**
  * @param {function} A callback function for the function to start timer 
  */
 CastPlayer.prototype.startProgressTimer = function(callback) {
@@ -1056,151 +782,28 @@ CastPlayer.prototype.startProgressTimer = function(callback) {
 };
 
 /**
- * Do AJAX call to load media json
- * @param {String} src A URL for media json.
- */
-CastPlayer.prototype.retrieveMediaJSON = function(src) {
-  var xhr = new XMLHttpRequest();
-  xhr.addEventListener('load', this.onMediaJsonLoad.bind(this));
-  xhr.addEventListener('error', this.onMediaJsonError.bind(this));
-  xhr.open('GET', src);
-  xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
-  xhr.responseType = "json";
-  xhr.send(null);
-};
-
-/**
- * Callback function for AJAX call on load success
- * @param {Object} evt An object returned from Ajax call
- */
-CastPlayer.prototype.onMediaJsonLoad = function(evt) {
-  var responseJson = evt.srcElement.response;
-  this.mediaContents = responseJson['categories'][0]['videos'];
-  var ni = document.getElementById('carousel');
-  var newdiv = null;
-  var divIdName = null;
-  for( var i = 0; i < this.mediaContents.length; i++ ) {
-    newdiv = document.createElement('div');
-    divIdName = 'thumb'+i+'Div';
-    newdiv.setAttribute('id',divIdName);
-    newdiv.setAttribute('class','thumb');
-    newdiv.innerHTML = '<img src="' + MEDIA_SOURCE_ROOT + this.mediaContents[i]['thumb'] + '" class="thumbnail">';
-    newdiv.addEventListener('click', this.selectMedia.bind(this, i));
-    ni.appendChild(newdiv);
-  }
-}
-
-/**
  * Callback function for AJAX call on load error
  */
 CastPlayer.prototype.onMediaJsonError = function() {
-  console.log("Failed to load media JSON");
+  console.log('Failed to load media JSON');
 }
 
-/**
- * Add video thumbnails div's to UI for media JSON contents 
- */
-CastPlayer.prototype.addVideoThumbs = function() {
-  this.mediaContents = mediaJSON['categories'][0]['videos'];
-  var ni = document.getElementById('carousel');
-  var newdiv = null;
-  var newdivBG = null;
+CastPlayer.prototype.addVideos = function() {
+  var videoList = document.getElementById('carousel');
+  var newdiv = document.createElement('div');
   var divIdName = null;
-  for( var i = 0; i < this.mediaContents.length; i++ ) {
-    newdiv = document.createElement('div');
-    divIdName = 'thumb'+i+'Div';
-    newdiv.setAttribute('id',divIdName);
-    newdiv.setAttribute('class','thumb');
-    newdiv.innerHTML = '<img src="' + MEDIA_SOURCE_ROOT + this.mediaContents[i]['thumb'] + '" class="thumbnail">';
-    newdiv.addEventListener('click', this.selectMedia.bind(this, i));
-    ni.appendChild(newdiv);
-  }
+  var link = document.createElement('a');
+  link.href =  'google.com'; 
+  link.innerHTML = 'link text';
+  var i = 0;
+  newdiv.appendChild(link);
+  newdiv.addEventListener('click', this.selectMedia.bind(this, i));
+  videoList.appendChild(newdiv);
 }
-
-/**
- * hardcoded media json objects
- */
-var mediaJSON = { "categories" : [ { "name" : "Movies",
-        "videos" : [ 
-		    { "description" : "Big Buck Bunny tells the story of a giant rabbit with a heart bigger than himself. When one sunny day three rodents rudely harass him, something snaps... and the rabbit ain't no bunny anymore! In the typical cartoon tradition he prepares the nasty rodents a comical revenge.\n\nLicensed under the Creative Commons Attribution license\nhttp://www.bigbuckbunny.org",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" ],
-              "subtitle" : "By Blender Foundation",
-              "thumb" : "images/BigBuckBunny.jpg",
-              "title" : "Big Buck Bunny"
-            },
-            { "description" : "The first Blender Open Movie from 2006",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" ],
-              "subtitle" : "By Blender Foundation",
-              "thumb" : "images/ElephantsDream.jpg",
-              "title" : "Elephant Dream"
-            },
-            { "description" : "HBO GO now works with Chromecast -- the easiest way to enjoy online video on your TV. For when you want to settle into your Iron Throne to watch the latest episodes. For $35.\nLearn how to use Chromecast with HBO GO and more at google.com/chromecast.",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" ],
-              "subtitle" : "By Google",
-              "thumb" : "images/ForBiggerBlazes.jpg",
-              "title" : "For Bigger Blazes"
-            },
-            { "description" : "Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For when Batman's escapes aren't quite big enough. For $35. Learn how to use Chromecast with Google Play Movies and more at google.com/chromecast.",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" ],
-              "subtitle" : "By Google",
-              "thumb" : "images/ForBiggerEscapes.jpg",
-              "title" : "For Bigger Escape"
-            },
-            { "description" : "Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For $35.  Find out more at google.com/chromecast.",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" ],
-              "subtitle" : "By Google",
-              "thumb" : "images/ForBiggerFun.jpg",
-              "title" : "For Bigger Fun"
-            },
-            { "description" : "Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For the times that call for bigger joyrides. For $35. Learn how to use Chromecast with YouTube and more at google.com/chromecast.",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" ],
-              "subtitle" : "By Google",
-              "thumb" : "images/ForBiggerJoyrides.jpg",
-              "title" : "For Bigger Joyrides"
-            },
-            { "description" :"Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For when you want to make Buster's big meltdowns even bigger. For $35. Learn how to use Chromecast with Netflix and more at google.com/chromecast.", 
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4" ],
-              "subtitle" : "By Google",
-              "thumb" : "images/ForBiggerMeltdowns.jpg",
-              "title" : "For Bigger Meltdowns"
-            },
-			{ "description" : "Sintel is an independently produced short film, initiated by the Blender Foundation as a means to further improve and validate the free/open source 3D creation suite Blender. With initial funding provided by 1000s of donations via the internet community, it has again proven to be a viable development model for both open 3D technology as for independent animation film.\nThis 15 minute film has been realized in the studio of the Amsterdam Blender Institute, by an international team of artists and developers. In addition to that, several crucial technical and creative targets have been realized online, by developers and artists and teams all over the world.\nwww.sintel.org",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" ],
-              "subtitle" : "By Blender Foundation",
-              "thumb" : "images/Sintel.jpg",
-              "title" : "Sintel"
-            },
-			{ "description" : "Smoking Tire takes the all-new Subaru Outback to the highest point we can find in hopes our customer-appreciation Balloon Launch will get some free T-shirts into the hands of our viewers.",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4" ],
-              "subtitle" : "By Garage419",
-              "thumb" : "images/SubaruOutbackOnStreetAndDirt.jpg",
-              "title" : "Subaru Outback On Street And Dirt"
-            },
-			{ "description" : "Tears of Steel was realized with crowd-funding by users of the open source 3D creation tool Blender. Target was to improve and test a complete open and free pipeline for visual effects in film - and to make a compelling sci-fi film in Amsterdam, the Netherlands.  The film itself, and all raw material used for making it, have been released under the Creatieve Commons 3.0 Attribution license. Visit the tearsofsteel.org website to find out more about this, or to purchase the 4-DVD box with a lot of extras.  (CC) Blender Foundation - http://www.tearsofsteel.org", 
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" ],
-              "subtitle" : "By Blender Foundation",
-              "thumb" : "images/TearsOfSteel.jpg",
-              "title" : "Tears of Steel"
-            },
-			{ "description" : "The Smoking Tire heads out to Adams Motorsports Park in Riverside, CA to test the most requested car of 2010, the Volkswagen GTI. Will it beat the Mazdaspeed3's standard-setting lap time? Watch and see...",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4" ],
-              "subtitle" : "By Garage419",
-              "thumb" : "images/VolkswagenGTIReview.jpg",
-              "title" : "Volkswagen GTI Review"
-            },
-			{ "description" : "The Smoking Tire is going on the 2010 Bullrun Live Rally in a 2011 Shelby GT500, and posting a video from the road every single day! The only place to watch them is by subscribing to The Smoking Tire or watching at BlackMagicShine.com",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4" ],
-              "subtitle" : "By Garage419",
-              "thumb" : "images/WeAreGoingOnBullrun.jpg",
-              "title" : "We Are Going On Bullrun"
-            },
-			{ "description" : "The Smoking Tire meets up with Chris and Jorge from CarsForAGrand.com to see just how far $1,000 can go when looking for a car. The Smoking Tire meets up with Chris and Jorge from CarsForAGrand.com to see just how far $1,000 can go when looking for a car.",
-              "sources" : [ "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4" ],
-              "subtitle" : "By Garage419",
-              "thumb" : "images/WhatCarCanYouGetForAGrand.jpg",
-              "title" : "What care can you get for a grand?"
-            }
-    ]}]};
 
  window.CastPlayer = CastPlayer;
 })();
+
+function gvd(msg) {
+  console.log('gvd : '+msg)
+}
