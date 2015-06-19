@@ -119,6 +119,7 @@ function sendMediaToReceiver() {
   }
   appendMessage("media loading...");
   var mediaInfo = new chrome.cast.media.MediaInfo('http://clips.vorwaerts-gmbh.de/VfE_html5.mp4');
+  mediaInfo.customData = {};
 
   mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
   mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;

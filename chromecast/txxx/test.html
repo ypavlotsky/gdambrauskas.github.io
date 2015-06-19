@@ -7,8 +7,18 @@
   var arr = new Uint8Array([73, 68, 51, 4, 0, 0, 0, 0, 0, 41, 84, 88, 88, 88, 0, 0, 0, 31,
         0, 0, 3, 0, 109, 100, 105, 97, 108, 111, 103, 95, 86, 73, 78, 68, 73, 67, 79, 49, 53, 50,
         55, 54, 54, 52, 95, 115, 116, 97, 114, 116, 0]);
+  arr = new Uint8Array([73,68,51,4,0,0,0,0,0,25,84,88,88,88,0,0,0,15,0,0,3,0,103,111,111,103,108,101,95,48,48,48,49,49,0]);
+  arr = new Uint8Array([0,103,111,111,103,108,101,95,48,48,48,49,50,0]);
+  var str = String.fromCharCode.apply(null, arr);
+  console.log('string '+str)
+  var s ="";
+  for (var i = 0; i < arr.length; i++) {
+    s += String.fromCharCode(arr[i]);
+  }
+  console.log(s)
   
-    var ID3_TEXT_ENCODING_ISO_8859_1 = 0;
+  
+  var ID3_TEXT_ENCODING_ISO_8859_1 = 0;
   var ID3_TEXT_ENCODING_UTF_16 = 1;
   var ID3_TEXT_ENCODING_UTF_16BE = 2;
   var ID3_TEXT_ENCODING_UTF_8 = 3;
@@ -50,7 +60,7 @@ utf8ByteArrayToString = function(bytes) {
    *     array.
    */
   function skipBytes(skipNumberOfBytes) {
-    setPosition(position + skipNumberOfBytes);
+    setPosition(position + skipNumberOfBytes, data.length);
   }
   
   /**
@@ -61,7 +71,7 @@ utf8ByteArrayToString = function(bytes) {
    *     array.
    */
   function setPosition(newPosition) {
-    if (position < 0 || position > limit) {
+    if (newPosition < 0 || newPosition > limit) {
       throw new Error("Invalid read");
     }
     position = newPosition;
@@ -95,50 +105,6 @@ utf8ByteArrayToString = function(bytes) {
   }
   
   
-  var id3Size = parseId3Header();
-  
-  while (id3Size > 0) {
-    var frameId = String.fromCharCode(dataView.getUint8(position++)) +
-        String.fromCharCode(dataView.getUint8(position++)) +
-        String.fromCharCode(dataView.getUint8(position++)) +
-        String.fromCharCode(dataView.getUint8(position++));
-    var frameSize = readSynchSafeInt32();
-    if (frameSize <= 1) {
-      break;
-    }
-    // Skip frame flags.
-    skipBytes(2);
-    if ('TXXX' == frameId) {
-      var encoding = dataView.getUint8(position++);
-      var frameDataView = new DataView(readBytes(frameSize - 1));
-      
-      // frame has description and value.
-      var firstTerminatingNullIndex = indexOfTerminatingNull(frameDataView, 0, encoding);
-      var description = readString(frameDataView, 0, firstTerminatingNullIndex,  encoding);
-      log("description "+description)
-      var value = readString(frameDataView, firstTerminatingNullIndex, frameDataView.byteLength,  encoding);
-      log("value "+value)
-    } else {
-      // Don't care about other tags.
-      skipBytes(frameSize - 1); 
-    }
-    id3Size -= frameSize + 10 /* header size */;
-  }
-
-function indexOfTerminatingNull(view, startIndex, encodingByte) {
-  switch (encoding) {
-    case ID3_TEXT_ENCODING_ISO_8859_1:
-    case ID3_TEXT_ENCODING_UTF_8:
-      return indexOfTerminatingNull(view, startIndex);
-      
-    case ID3_TEXT_ENCODING_UTF_16:
-    case ID3_TEXT_ENCODING_UTF_16BE:
-      return indexOfTerminatingNullUTF16(view, startIndex);
-      
-    default:
-      return -1;
-  }
-}
 
 function readString(view, startIndex, terminatorIndex, encoding) {
   switch (encoding) {
@@ -230,15 +196,6 @@ function indexOfTerminatingNullUTF16(view, startIndex) {
   return -1;
 };
 
-function readNullTerminatedString(){
-  var str = "";
-  for(var ch = String.fromCharCode(data[position++]);
-      ch[0] != '\0';
-      ch = String.fromCharCode(data[position++])) {
-        str += ch;
-      }
-  return str;
-};
   
   function parseId3Header() {
     var id1 = String.fromCharCode(dataView.getUint8(position++));
@@ -272,6 +229,36 @@ function readNullTerminatedString(){
   
   function log(msg) {
     console.log(msg);
+  }
+  
+  var id3Size = parseId3Header();
+  
+  while (id3Size > 0) {
+    var frameId = String.fromCharCode(dataView.getUint8(position++)) +
+        String.fromCharCode(dataView.getUint8(position++)) +
+        String.fromCharCode(dataView.getUint8(position++)) +
+        String.fromCharCode(dataView.getUint8(position++));
+    var frameSize = readSynchSafeInt32();
+    if (frameSize <= 1) {
+      break;
+    }
+    // Skip frame flags.
+    skipBytes(2);
+    if ('TXXX' == frameId) {
+      var encoding = dataView.getUint8(position++);
+      var frameDataView = new DataView(readBytes(frameSize - 1));
+      
+      // frame has description and value.
+      var firstTerminatingNullIndex = indexOfTerminatingNull(frameDataView, 0, encoding);
+      var description = readString(frameDataView, 0, firstTerminatingNullIndex,  encoding);
+      log("description "+description)
+      var value = readString(frameDataView, firstTerminatingNullIndex, frameDataView.byteLength,  encoding);
+      log("value "+value)
+    } else {
+      // Don't care about other tags.
+      skipBytes(frameSize - 1); 
+    }
+    id3Size -= frameSize + 10 /* header size */;
   }
   
   
