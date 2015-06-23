@@ -130,20 +130,6 @@ ima.chromecast.TxxxFrameParser.prototype.readBytes = function(bytesCount) {
   for (var i = this.position; i < (this.position + bytesCount); i++) {
     read[j++] = this.data[i];
   }
-  var debugBytes = [];
-  for (var i = 0; i < read.length; i++) {
-    debugBytes.push(read[i]);
-  }
-  log("debug bytes: "+debugBytes);
-  var s ="";
-  for (var i = 0; i < read.length; i++) {
-    s += String.fromCharCode(read[i]);
-  }
-  console.log("s: "+s)
-  // gvd
-//  var buffer = this.data.buffer.slice(this.position, this.position + bytesCount);
-//  this.position += bytesCount;
-//  return buffer;
   return read;
 }
 
