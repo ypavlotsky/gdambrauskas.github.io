@@ -77,8 +77,10 @@ ima.chromecast.TxxxFrameParser.prototype.parse = function() {
       // frame has description and value.
       var firstTerminatingNullIndex = this.indexOfTerminatingNull_(frameDataView, 0, encoding);
       var description = this.readString_(frameDataView, 0, firstTerminatingNullIndex,  encoding);
+      log('desciprtion '+description)
       var valueStartIndex = firstTerminatingNullIndex + this.delimiterLength(encoding);
       var value = this.readString_(frameDataView, valueStartIndex, frameDataView.byteLength,  encoding);
+      log('value '+value)
     } else {
       // Don't care about other tags.
       this.skipBytes_(frameSize - 1); 
