@@ -193,8 +193,8 @@ ima.chromecast.TxxxFrameParser.prototype.readString_ = function(view, startIndex
 };
 
 ima.chromecast.TxxxFrameParser.prototype.delimiterLength = function(encoding) {
-  return (encoding == this.ID3_TEXT_ENCODING_ISO_8859_1
-      || encoding == this.ID3_TEXT_ENCODING_UTF_8) ? 1 : 2;
+  return (encoding == ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_ISO_8859_1
+      || encoding == ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_UTF_8) ? 1 : 2;
 }
 
 ima.chromecast.TxxxFrameParser.prototype.indexOfTerminatingNull_ = function(view, startIndex) {
