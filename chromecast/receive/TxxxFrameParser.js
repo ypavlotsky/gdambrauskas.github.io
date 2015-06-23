@@ -72,6 +72,7 @@ ima.chromecast.TxxxFrameParser.prototype.parse = function() {
     this.skipBytes_(2);
     if ('TXXX' == frameId) {
       var encoding = this.readUnsignedByte_();
+      log('encoding '+encoding)
       var frameDataView = new DataView(this.readBytes(frameSize - 1).buffer);
       // frame has description and value.
       var firstTerminatingNullIndex = this.indexOfTerminatingNull_(frameDataView, 0, encoding);
