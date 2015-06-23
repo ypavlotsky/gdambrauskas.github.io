@@ -46,7 +46,6 @@ ima.chromecast = {};
 
 ima.chromecast.TxxxFrameParser = function(data/*Uint8Array*/) {
   this.data = data;
-  
   this.position = 0;
   this.limit = data.length;
 }
@@ -55,21 +54,6 @@ ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_ISO_8859_1 = 0;
 ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_UTF_16 = 1;
 ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_UTF_16BE = 2;
 ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_UTF_8 = 3;
-
-/**
- * Moves the reading offset by {@code bytes}.
- *
- * @throws IllegalArgumentException Thrown if the new position is neither in nor at the end of the
- *     array.
- */
-ima.chromecast.TxxxFrameParser.prototype.skipBytes = function(skipNumberOfBytes) {
-  this.setPosition(this.position + skipNumberOfBytes);
-}
-
-/** Reads the next byte as an unsigned value. */
-ima.chromecast.TxxxFrameParser.prototype.readUnsignedByte = function() {
-  return this.data[this.position++] & 0xFF;
-}
 
 ima.chromecast.TxxxFrameParser.prototype.parse = function() {
 
@@ -106,6 +90,21 @@ ima.chromecast.TxxxFrameParser.prototype.parse = function() {
 }
 
 /**
+ * Moves the reading offset by {@code bytes}.
+ *
+ * @throws IllegalArgumentException Thrown if the new position is neither in nor at the end of the
+ *     array.
+ */
+ima.chromecast.TxxxFrameParser.prototype.skipBytes = function(skipNumberOfBytes) {
+  this.setPosition(this.position + skipNumberOfBytes);
+}
+
+/** Reads the next byte as an unsigned value. */
+ima.chromecast.TxxxFrameParser.prototype.readUnsignedByte = function() {
+  return this.data[this.position++] & 0xFF;
+}
+
+/**
  * Sets the reading offset in the array.
  *
  * @param position Byte offset in the array from which to read.
@@ -113,7 +112,7 @@ ima.chromecast.TxxxFrameParser.prototype.parse = function() {
  *     array.
  */
 ima.chromecast.TxxxFrameParser.prototype.setPosition = function(newPosition) {
-  if (newPosition < 0 || newPosition > this.limit) {
+  if (newPosition < 0 || newPosition >= this.limit) {
     throw new Error("Invalid read");
   }
   this.position = newPosition;
@@ -134,10 +133,8 @@ ima.chromecast.TxxxFrameParser.prototype.readBytes = function(bytesCount) {
 }
 
 /**
- * Reads a Synchsafe integer.
- * <p>
- * Synchsafe integers keep the highest bit of every byte zeroed. A 32 bit synchsafe integer can
- * store 28 bits of information.
+ * Reads a Synchsafe integer. Synchsafe integers keep the highest bit of every
+ * byte zeroed. A 32 bit synchsafe integer can store 28 bits of information.
  *
  * @return The parsed value.
  */
