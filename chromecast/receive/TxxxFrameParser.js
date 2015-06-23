@@ -56,37 +56,65 @@ ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_UTF_16BE = 2;
 ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_UTF_8 = 3;
 
 ima.chromecast.TxxxFrameParser.prototype.parse = function() {
-
-  var id3Size = this.parseId3Header();
-  
+  var id3Size = this.parseId3Header_();
   while (id3Size > 0) {
-    var byte1 = this.readUnsignedByte();
-    var byte2 = this.readUnsignedByte();
-    var byte3 = this.readUnsignedByte();
-    var byte4 = this.readUnsignedByte();
-    var frameId = String.fromCharCode(byte1) + String.fromCharCode(byte2) + String.fromCharCode(byte3) + String.fromCharCode(byte4);
+    var byte1 = this.readUnsignedByte_();
+    var byte2 = this.readUnsignedByte_();
+    var byte3 = this.readUnsignedByte_();
+    var byte4 = this.readUnsignedByte_();
+    var frameId = String.fromCharCode(byte1) + String.fromCharCode(byte2) +
+        String.fromCharCode(byte3) + String.fromCharCode(byte4);
     var frameSize = this.readSynchSafeInt32();
     if (frameSize <= 1) {
       break;
     }
     // Skip frame flags.
-    this.skipBytes(2);
+    this.skipBytes_(2);
     if ('TXXX' == frameId) {
-      var encoding = this.readUnsignedByte();
+      var encoding = this.readUnsignedByte_();
       var frameDataView = new DataView(this.readBytes(frameSize - 1).buffer);
-      
       // frame has description and value.
-      var firstTerminatingNullIndex = this.indexOfTerminatingNull(frameDataView, 0, encoding);
-      var description = this.readString(frameDataView, 0, firstTerminatingNullIndex,  encoding);
-      log("description "+description)
-      var value = this.readString(frameDataView, firstTerminatingNullIndex, frameDataView.byteLength,  encoding);
-      log("value "+value)
+      var firstTerminatingNullIndex = this.indexOfTerminatingNull_(frameDataView, 0, encoding);
+      var description = this.readString_(frameDataView, 0, firstTerminatingNullIndex,  encoding);
+      var valueStartIndex = firstTerminatingNullIndex + this.delimiterLength(encoding);
+      var value = this.readString_(frameDataView, valueStartIndex, frameDataView.byteLength,  encoding);
     } else {
       // Don't care about other tags.
-      this.skipBytes(frameSize - 1); 
+      this.skipBytes_(frameSize - 1); 
     }
     id3Size -= frameSize + 10 /* header size */;
   }
+}
+
+ima.chromecast.TxxxFrameParser.prototype.parseId3Header_ = function() {
+  var byte1 = this.readUnsignedByte_();
+  var byte2 = this.readUnsignedByte_();
+  var byte3 = this.readUnsignedByte_();
+  var identifier = String.fromCharCode(byte1) + String.fromCharCode(byte2) + String.fromCharCode(byte3);
+  if ('ID3' != identifier) {
+    throw Error("Unexpected ID3 file identifier");
+  }
+  
+  // Skip version, this parser handles version that our ad insertion system
+  // produces.
+  this.skipBytes_(2);
+  var flags = this.readUnsignedByte_();
+  var id3Size = this.readSynchSafeInt32();
+  
+  // Check if extended header is present.
+  if ((flags & 0x2) != 0) {
+    var extendedHeaderSize = this.readSynchSafeInt32();
+    if (extendedHeaderSize > 4) {
+      this.skipBytes_(extendedHeaderSize - 4);
+    }
+    id3Size -= extendedHeaderSize;
+  }
+
+  // Check if footer presents.
+  if ((flags & 0x8) != 0) {
+    id3Size -= 10;
+  }
+  return id3Size;
 }
 
 /**
@@ -95,12 +123,12 @@ ima.chromecast.TxxxFrameParser.prototype.parse = function() {
  * @throws IllegalArgumentException Thrown if the new position is neither in nor at the end of the
  *     array.
  */
-ima.chromecast.TxxxFrameParser.prototype.skipBytes = function(skipNumberOfBytes) {
+ima.chromecast.TxxxFrameParser.prototype.skipBytes_ = function(skipNumberOfBytes) {
   this.setPosition(this.position + skipNumberOfBytes);
 }
 
 /** Reads the next byte as an unsigned value. */
-ima.chromecast.TxxxFrameParser.prototype.readUnsignedByte = function() {
+ima.chromecast.TxxxFrameParser.prototype.readUnsignedByte_ = function() {
   return this.data[this.position++] & 0xFF;
 }
 
@@ -139,21 +167,21 @@ ima.chromecast.TxxxFrameParser.prototype.readBytes = function(bytesCount) {
  * @return The parsed value.
  */
 ima.chromecast.TxxxFrameParser.prototype.readSynchSafeInt32 = function() {
-  var byte1 = this.readUnsignedByte();
-  var byte2 = this.readUnsignedByte();
-  var byte3 = this.readUnsignedByte();
-  var byte4 = this.readUnsignedByte();
+  var byte1 = this.readUnsignedByte_();
+  var byte2 = this.readUnsignedByte_();
+  var byte3 = this.readUnsignedByte_();
+  var byte4 = this.readUnsignedByte_();
   return (byte1 << 21) | (byte2 << 14) | (byte3 << 7) | byte4;
 }
 
-ima.chromecast.TxxxFrameParser.prototype.readString = function(view, startIndex, terminatorIndex, encoding) {
+ima.chromecast.TxxxFrameParser.prototype.readString_ = function(view, startIndex, terminatorIndex, encoding) {
   switch (encoding) {
     case ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_ISO_8859_1:
       return readNullTerminatedString(view, startIndex);
 
     case ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_UTF_16:
     case ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_UTF_16BE:
-      return this.readNullTerminatedStringUTF16(view, startIndex);
+      return this.readNullTerminatedStringUTF16_(view, startIndex);
 
     case ima.chromecast.TxxxFrameParser.ID3_TEXT_ENCODING_UTF_8:
       return utf8ByteArrayToString(new Uint8Array(view.buffer.slice(startIndex, terminatorIndex)));
@@ -163,7 +191,12 @@ ima.chromecast.TxxxFrameParser.prototype.readString = function(view, startIndex,
   }
 };
 
-ima.chromecast.TxxxFrameParser.prototype.indexOfTerminatingNull = function(view, startIndex) {
+ima.chromecast.TxxxFrameParser.prototype.delimiterLength(int encodingByte) {
+  return (encodingByte == this.ID3_TEXT_ENCODING_ISO_8859_1
+      || encodingByte == this.ID3_TEXT_ENCODING_UTF_8) ? 1 : 2;
+}
+
+ima.chromecast.TxxxFrameParser.prototype.indexOfTerminatingNull_ = function(view, startIndex) {
   for (var i = startIndex; i < view.byteLength; i++) {
     if (view.getUint8(i) == 0) {
       return i;
@@ -172,20 +205,18 @@ ima.chromecast.TxxxFrameParser.prototype.indexOfTerminatingNull = function(view,
   return -1;
 };
 
-ima.chromecast.TxxxFrameParser.prototype.readNullTerminatedStringUTF16 = function(view, startIndex) {
+ima.chromecast.TxxxFrameParser.prototype.readNullTerminatedStringUTF16_ = function(view, startIndex) {
   var code;
   var codes = [];
-
   for (var i = startIndex; i < view.byteLength; i +=2) {
     var code = dataView.getUint16(pos + i);
     if (code == 0) break;
     codes.push(code);
   }
-
   return String.fromCharCode.apply(null, codes);
 };
 
-ima.chromecast.TxxxFrameParser.prototype.indexOfTerminatingNullUTF16 = function(view, startIndex) {
+ima.chromecast.TxxxFrameParser.prototype.indexOfTerminatingNullUTF16_ = function(view, startIndex) {
   for (var i = startIndex; i < view.byteLength; i++) {
     if (view.getUint16(i) == 0) {
       return i;
@@ -193,36 +224,3 @@ ima.chromecast.TxxxFrameParser.prototype.indexOfTerminatingNullUTF16 = function(
   }
   return -1;
 };
-
-ima.chromecast.TxxxFrameParser.prototype.parseId3Header = function() {
-  var byte1 = this.readUnsignedByte();
-  var byte2 = this.readUnsignedByte();
-  var byte3 = this.readUnsignedByte();
-  var identifier = String.fromCharCode(byte1) + String.fromCharCode(byte2) + String.fromCharCode(byte3);
-  if ('ID3' != identifier) {
-    throw Error("Unexpected ID3 file identifier");
-  }
-  
-  // Skip version, this parser handles version that our ad insertion system
-  // produces.
-  this.skipBytes(2);
-
-  var flags = this.readUnsignedByte();
-  
-  var id3Size = this.readSynchSafeInt32();
-  
-  // Check if extended header is present.
-  if ((flags & 0x2) != 0) {
-    var extendedHeaderSize = this.readSynchSafeInt32();
-    if (extendedHeaderSize > 4) {
-      this.skipBytes(extendedHeaderSize - 4);
-    }
-    id3Size -= extendedHeaderSize;
-  }
-
-  // Check if footer presents.
-  if ((flags & 0x8) != 0) {
-    id3Size -= 10;
-  }
-  return id3Size;
-}
