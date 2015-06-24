@@ -46,20 +46,13 @@
 
 'use strict';
 
-//var byteData = new Uint8Array([73,68,51,4,0,0,0,0,0,25,84,88,88,88,0,0,0,15,0,0,3,0,103,111,111,103,108,101,95,48,48,48,49,49,0]);
-//var byteDataView = new DataView(byteData.buffer);
-//var c1 = String.fromCharCode(byteDataView.getUint8(0));
-//var c2 = String.fromCharCode(byteDataView.getUint8(1));
-//var c3 = String.fromCharCode(byteDataView.getUint8(2));
-//log("cs "+c1)
-
 function processMetadata(type,data,timestamp) { // gvd
   var debugBytes = [];
   for (var i = 0; i < data.length; i++) {
     debugBytes.push(data[i]);
   }
   log(debugBytes);
-  var parser = new ima.chromecast.TxxxFrameParser(data);
+  var parser = new ima.chromecast.TxxxFrameParser(new ByteReader(data));
   parser.parse();   
 }
 
