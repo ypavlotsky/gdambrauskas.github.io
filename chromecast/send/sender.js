@@ -2,16 +2,6 @@
   'use strict';
 
 /**
- * Media source root URL
- **/
-var MEDIA_SOURCE_ROOT = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/';
-
-/**
- * Media source URL JSON
- **/
-var MEDIA_SOURCE_URL = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/videos.json';
-
-/**
  * Width of progress bar in pixel
  **/
 var PROGRESS_BAR_WIDTH = 600;
@@ -114,7 +104,6 @@ CastPlayer.prototype.initializeCastPlayer = function() {
   // optional: you may change it to point to your own
   //var applicationID = chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID;
   var applicationID = 'BC48F4DE';
-  //var applicationID = '4D8EA828';
 
   // auto join policy can be one of the following three
   var autoJoinPolicy = chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED;
@@ -130,7 +119,6 @@ CastPlayer.prototype.initializeCastPlayer = function() {
 
   chrome.cast.initialize(apiConfig, this.onInitSuccess.bind(this), this.onError.bind(this));
 
-  this.addVideos();
   this.initializeUI();
 };
 
@@ -786,19 +774,6 @@ CastPlayer.prototype.startProgressTimer = function(callback) {
  */
 CastPlayer.prototype.onMediaJsonError = function() {
   console.log('Failed to load media JSON');
-}
-
-CastPlayer.prototype.addVideos = function() {
-  var videoList = document.getElementById('carousel');
-  var newdiv = document.createElement('div');
-  var divIdName = null;
-  var link = document.createElement('a');
-  link.href =  'google.com'; 
-  link.innerHTML = 'link text';
-  var i = 0;
-  newdiv.appendChild(link);
-  newdiv.addEventListener('click', this.selectMedia.bind(this, i));
-  videoList.appendChild(newdiv);
 }
 
  window.CastPlayer = CastPlayer;
