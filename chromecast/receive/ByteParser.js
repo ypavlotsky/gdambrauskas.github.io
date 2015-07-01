@@ -58,10 +58,10 @@ ima.chromecast.ByteReader.prototype.readBytes = function(bytesCount) {
  * @return The parsed value.
  */
 ima.chromecast.ByteReader.prototype.readSynchSafeInt32 = function() {
-  var byte1 = this.readUnsignedByte_();
-  var byte2 = this.readUnsignedByte_();
-  var byte3 = this.readUnsignedByte_();
-  var byte4 = this.readUnsignedByte_();
+  var byte1 = this.readUnsignedByte();
+  var byte2 = this.readUnsignedByte();
+  var byte3 = this.readUnsignedByte();
+  var byte4 = this.readUnsignedByte();
   return (byte1 << 21) | (byte2 << 14) | (byte3 << 7) | byte4;
 }
 
