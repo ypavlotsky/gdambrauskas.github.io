@@ -42,7 +42,7 @@ function log(msg) {
 }
 
 
-ima = ima || {};
+var ima = ima || {};
 ima.chromecast = ima.chromecast || {};
 
 

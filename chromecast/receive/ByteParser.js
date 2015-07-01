@@ -1,5 +1,5 @@
 
-ima = ima || {};
+var ima = ima || {};
 ima.chromecast = ima.chromecast || {};
 
 ima.chromecast.ByteReader = function(data/*Uint8Array*/) {
