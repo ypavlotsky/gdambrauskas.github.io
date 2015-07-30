@@ -51,7 +51,7 @@ function processMetadata(type,data,timestamp) { // gvd
   for (var i = 0; i < data.length; i++) {
     debugBytes.push(data[i]);
   }
-  log(debugBytes);
+  console.log(debugBytes);
   var reader = new google.ima.ByteReader(debugBytes);
   var parser = new google.ima.TxxxFrameParser(reader);
   var results = parser.parse();
