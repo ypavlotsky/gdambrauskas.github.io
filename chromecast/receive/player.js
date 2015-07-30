@@ -52,8 +52,10 @@ function processMetadata(type,data,timestamp) { // gvd
     debugBytes.push(data[i]);
   }
   log(debugBytes);
-  var parser = new ima.chromecast.TxxxFrameParser(new ByteReader(data));
-  parser.parse();   
+  var reader = new google.ima.ByteReader(debugBytes);
+  var parser = new google.ima.TxxxFrameParser(reader);
+  var results = parser.parse();
+  console.log("gvd parsed "+results[0]);
 }
 
 /**
@@ -624,7 +626,7 @@ sampleplayer.CastPlayer.prototype.load = function(info) {
   var media = info.message.media || {};
   console.log("gvd info  "+media.customData.foo)
   var contentType = media.contentType;
-  var playerType = sampleplayer.getType_(media);  
+  var playerType = sampleplayer.getType_(media);
   var isLiveStream = media.streamType === cast.receiver.media.StreamType.LIVE;
   if (!media.contentId) {
     this.log_('Load failed: no content');
