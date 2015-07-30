@@ -74,7 +74,8 @@ ima.chromecast.ByteReader.indexOfTerminatingNull = function(view, startIndex) {
   return -1;
 };
 
-ima.chromecast.ByteReader.indexOfTerminatingNullUTF16 = function(view, startIndex) {
+ima.chromecast.ByteReader.indexOfTerminatingNullUTF16 = function(view,
+                                                                 startIndex) {
   for (var i = startIndex; i < view.byteLength; i++) {
     if (view.getUint16(i) == 0) {
       return i;
@@ -83,7 +84,8 @@ ima.chromecast.ByteReader.indexOfTerminatingNullUTF16 = function(view, startInde
   return -1;
 };
 
-ima.chromecast.ByteReader.readNullTerminatedBytesUTF16 = function(view, startIndex) {
+ima.chromecast.ByteReader.readNullTerminatedBytesUTF16 =function(view,
+                                                                 startIndex) {
   var byte;
   var bytes = [];
   for (var i = startIndex; i < view.byteLength; i +=2) {
