@@ -52,7 +52,7 @@ function processMetadata(type,data,timestamp) { // gvd
     debugBytes.push(data[i]);
   }
   console.log(debugBytes);
-  var reader = new google.ima.ByteReader(debugBytes);
+  var reader = new google.ima.ByteReader(data);
   var parser = new google.ima.TxxxFrameParser(reader);
   var results = parser.parse();
   console.log("gvd parsed "+results[0]);
