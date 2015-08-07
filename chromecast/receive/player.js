@@ -600,7 +600,10 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
     'url': url,
     'mediaElement': self.mediaElement_
   });
-  host.processMetadata = processMetadata;
+  this.receiverStreamManager_ =
+      new ima.cast.ReceiverStreamManager(this.mediaElement_,
+          this.mediaManager_);
+  host.processMetadata = this.receiverStreamManager_.processMetadata;
   host.onError = function() {
     self.preloadPlayer_.unload();
     self.preloadPlayer_ = null;
