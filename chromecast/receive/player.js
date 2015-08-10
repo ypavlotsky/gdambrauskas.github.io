@@ -46,16 +46,15 @@
 
 'use strict';
 
-function processMetadata(type,data,timestamp) { // gvd
-  var debugBytes = [];
-  for (var i = 0; i < data.length; i++) {
-    debugBytes.push(data[i]);
-  }
-  console.log(debugBytes);
-  var reader = new google.ima.ByteReader(data);
-  var parser = new google.ima.TxxxFrameParser(reader);
-  var results = parser.parse();
-  console.log("gvd parsed "+results[0]);
+function gvdrequeststream(m) {
+  var streamRequest = new ima.cast.StreamRequest();
+  streamRequest.apiKey = 'apiKey';
+  streamRequest.assetKey = 'assetKey';
+  streamRequest.streamType = ima.cast.StreamRequest.StreamType.EVENT;
+  streamRequest.attemptPreroll = false;
+  streamRequest.customParameters = 'bar=1&foo=2';
+  //this.receiverStreamManager_.addEventListener(type, func, false)
+  m.requestStream(streamRequest);
 }
 
 /**
@@ -278,6 +277,16 @@ sampleplayer.CastPlayer = function(element) {
    * @private {cast.receiver.MediaManager}
    */
   this.mediaManager_ = new cast.receiver.MediaManager(this.mediaElement_);
+  this.receiverStreamManager_ =
+    new ima.cast.ReceiverStreamManager(this.mediaElement_, this.mediaManager_);
+  var streamRequest = new ima.cast.StreamRequest();
+  streamRequest.apiKey = 'apiKey';
+  streamRequest.assetKey = 'assetKey';
+  streamRequest.streamType = ima.cast.StreamRequest.StreamType.EVENT;
+  streamRequest.attemptPreroll = false;
+  streamRequest.customParameters = 'bar=1&foo=2';
+  //this.receiverStreamManager_.addEventListener(type, func, false)
+  //this.receiverStreamManager_.requestStream(streamRequest);
 
   /**
    * The original load callback.
@@ -600,10 +609,6 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
     'url': url,
     'mediaElement': self.mediaElement_
   });
-  this.receiverStreamManager_ =
-      new ima.cast.ReceiverStreamManager(this.mediaElement_,
-          this.mediaManager_);
-  host.processMetadata = this.receiverStreamManager_.processMetadata;
   host.onError = function() {
     self.preloadPlayer_.unload();
     self.preloadPlayer_ = null;
@@ -611,6 +616,9 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
     self.displayPreviewMode_ = false;
     self.log_('Error during preload');
   };
+  host.processMetadata = this.receiverStreamManager_.processMetadata;
+  gvdrequeststream(this.receiverStreamManager_);
+
   self.preloadPlayer_ = new cast.player.api.Player(host);
   self.preloadPlayer_.preload(protocolFunc(host));
   return true;
@@ -847,7 +855,8 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         'url': url,
         'mediaElement': this.mediaElement_
       });
-      host.processMetadata = processMetadata;
+      host.processMetadata = this.receiverStreamManager_.processMetadata;
+      gvdrequeststream(this.receiverStreamManager_);
       host.onError = loadErrorCallback;
       this.player_ = new cast.player.api.Player(host);
       this.player_.load(protocolFunc(host));
@@ -1013,7 +1022,8 @@ sampleplayer.CastPlayer.prototype.processTtmlCues_ =
         'url': '',
         'mediaElement': this.mediaElement_
       });
-      host.processMetadata = processMetadata;
+      host.processMetadata = this.receiverStreamManager_.processMetadata;
+      gvdrequeststream(this.receiverStreamManager_);
       this.protocol_ = null;
       this.player_ = new cast.player.api.Player(host);
     }
