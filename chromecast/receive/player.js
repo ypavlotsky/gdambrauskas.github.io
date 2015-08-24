@@ -55,6 +55,7 @@ function gvdrequeststream(m) {
   streamRequest.customParameters = 'bar=1&foo=2';
   //this.receiverStreamManager_.addEventListener(type, func, false)
   console.log('gvd xxxx streamRequest.apiKey '+streamRequest.apiKey)
+  console.log(streamRequest)
   m.requestStream(streamRequest);
 }
 
