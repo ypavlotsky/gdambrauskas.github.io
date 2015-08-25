@@ -287,7 +287,7 @@ sampleplayer.CastPlayer = function(element) {
   streamRequest.assetKey = 'assetKey';
   streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.EVENT;
   streamRequest.attemptPreroll = false;
-  streamRequest.customParameters = 'bar=1&foo=2';
+  streamRequest.customParameters = 'bar=0&foo=1';
   //this.receiverStreamManager_.addEventListener(type, func, false)
   //this.receiverStreamManager_.requestStream(streamRequest);
 
