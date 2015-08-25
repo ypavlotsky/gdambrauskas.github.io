@@ -282,10 +282,10 @@ sampleplayer.CastPlayer = function(element) {
   this.receiverStreamManager_ =
     new google.ima.cast.ReceiverStreamManager(this.mediaElement_,
                                               this.mediaManager_);
-  var streamRequest = new ima.cast.StreamRequest();
+  var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.apiKey = 'apiKey';
   streamRequest.assetKey = 'assetKey';
-  streamRequest.streamType = ima.cast.StreamRequest.StreamType.EVENT;
+  streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.EVENT;
   streamRequest.attemptPreroll = false;
   streamRequest.customParameters = 'bar=1&foo=2';
   //this.receiverStreamManager_.addEventListener(type, func, false)
