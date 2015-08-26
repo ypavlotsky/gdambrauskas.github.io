@@ -289,6 +289,13 @@ sampleplayer.CastPlayer = function(element) {
         console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED ")
         console.log(event.type)
         console.log(event.getData())
+        var streamUrl = event.getData().streamUrl;
+        var subtitles = event.getData().subtitles;
+        this.player_.getHost().url = streamUrl;
+        /*
+         Object
+         streamUrl: "http://truman-qa.sandbox.google.com/ssai/master/event/nSDLa3IJTLCecel2IaECyA/session/05222fd5-aed3-4652-ab43-74077295a810/master.m3u8"subtitles: Array[0]
+         */
         // gvd self.onReceiverStreamManagerEvent_(),
       },
       false);
@@ -617,11 +624,11 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
     this.log_('No protocol found for preload');
     return false;
   }
-  var host = new cast.player.api.Host({
-    'url': url,
+  this.host_ = new cast.player.api.Host({
+    // gvd 'url': url,
     'mediaElement': self.mediaElement_
   });
-  host.onError = function() {
+  this.host_.onError = function() {
     self.preloadPlayer_.unload();
     self.preloadPlayer_ = null;
     self.showPreviewModeMetadata(false);
@@ -629,14 +636,14 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
     self.log_('Error during preload');
   };
   var self = this;
-  host.processMetadata = function(type, data, timestamp) {
+  this.host_.processMetadata = function(type, data, timestamp) {
     console.log("gvd self.receiverStreamManager_ ")
     self.receiverStreamManager_.processMetadata(type, data, timestamp);
   };
   gvdrequeststream(this.receiverStreamManager_);
 
-  self.preloadPlayer_ = new cast.player.api.Player(host);
-  self.preloadPlayer_.preload(protocolFunc(host));
+  self.preloadPlayer_ = new cast.player.api.Player(this.host_);
+  self.preloadPlayer_.preload(protocolFunc(this.host_));
   return true;
 };
 
@@ -867,18 +874,18 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         this.preloadPlayer_ = null;
       }
       this.log_('Regular video load');
-      var host = new cast.player.api.Host({
-        'url': url,
+      this.host_ = new cast.player.api.Host({
+        // gvd 'url': url,
         'mediaElement': this.mediaElement_
       });
       var self = this;
-      host.processMetadata = function(type, data, timestamp) {
+      this.host_.processMetadata = function(type, data, timestamp) {
         self.receiverStreamManager_.processMetadata(type, data, timestamp);
       };
       gvdrequeststream(this.receiverStreamManager_);
-      host.onError = loadErrorCallback;
-      this.player_ = new cast.player.api.Player(host);
-      this.player_.load(protocolFunc(host));
+      this.host_.onError = loadErrorCallback;
+      this.player_ = new cast.player.api.Player(this.host_);
+      this.player_.load(protocolFunc(this.host_));
     } else {
       this.log_('Preloaded video load');
       this.player_ = this.preloadPlayer_;
