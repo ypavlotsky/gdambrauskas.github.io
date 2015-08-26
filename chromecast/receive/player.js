@@ -180,12 +180,6 @@ sampleplayer.CastPlayer = function(element) {
   this.totalTimeElement_ = this.getElementByClass_('.controls-total-time');
 
   /**
-   * The DOM element for the preview time label.
-   * @private {!Element}
-   */
-  this.previewModeTimerElement_ = this.getElementByClass_('.preview-mode-timer-countdown');
-
-  /**
    * Handler for buffering-related events for MediaElement.
    * @private {function()}
    */
@@ -208,12 +202,6 @@ sampleplayer.CastPlayer = function(element) {
    * @private {boolean}
    */
   this.playerAutoPlay_ = false;
-
-  /**
-   * Whether player app should display the preview mode UI.
-   * @private {boolean}
-   */
-  this.displayPreviewMode_ = false;
 
   /**
    * Id of deferred play callback
@@ -351,9 +339,6 @@ sampleplayer.CastPlayer = function(element) {
 
   this.mediaManager_.customizedStatusCallback =
       this.customizedStatusCallback_.bind(this);
-
-  this.mediaManager_.onPreload = this.onPreload_.bind(this);
-  this.mediaManager_.onCancelPreload = this.onCancelPreload_.bind(this);
 };
 
 
@@ -532,41 +517,6 @@ sampleplayer.CastPlayer.prototype.start = function() {
   this.receiverManager_.start();
 };
 
-
-/**
- * Display preview mode metadata.
- *
- * @param {boolean} show whether player is showing preview mode metadata
- * @export
- */
-sampleplayer.CastPlayer.prototype.showPreviewModeMetadata = function(show) {
-  this.element_.setAttribute('preview-mode', show.toString());
-};
-
-/**
- * Show the preview mode UI.
- *
- * @param {!cast.receiver.media.MediaInformation} mediaInformation The
- *     asset media information.
- * @private
- */
-sampleplayer.CastPlayer.prototype.showPreviewMode_ = function(mediaInformation) {
-  this.displayPreviewMode_ = true;
-  this.loadPreviewModeMetadata_(mediaInformation);
-  this.showPreviewModeMetadata(true);
-};
-
-
-/**
- * Hide the preview mode UI.
- *
- * @private
- */
-sampleplayer.CastPlayer.prototype.hidePreviewMode_ = function() {
-  this.showPreviewModeMetadata(false);
-  this.displayPreviewMode_ = false;
-};
-
 /**
  * Loads the given data.
  *
@@ -693,31 +643,6 @@ sampleplayer.CastPlayer.prototype.loadMetadata_ = function(media) {
 
 
 /**
- * Loads the metadata for the given preview mode media.
- *
- * @param {!cast.receiver.media.MediaInformation} media The media.
- * @private
- */
-sampleplayer.CastPlayer.prototype.loadPreviewModeMetadata_ = function(media) {
-  this.log_('loadPreviewModeMetadata_');
-  if (!sampleplayer.isCastForAudioDevice_()) {
-    var metadata = media.metadata || {};
-    var titleElement = this.element_.querySelector('.preview-mode-title');
-    sampleplayer.setInnerText_(titleElement, metadata.title);
-
-    var subtitleElement = this.element_.querySelector('.preview-mode-subtitle');
-    sampleplayer.setInnerText_(subtitleElement, metadata.subtitle);
-
-    var artwork = sampleplayer.getMediaImageUrl_(media);
-    if (artwork) {
-      var artworkElement = this.element_.querySelector('.preview-mode-artwork');
-      sampleplayer.setBackgroundImage_(artworkElement, artwork);
-    }
-  }
-};
-
-
-/**
  * Lets player handle autoplay, instead of depending on underlying
  * MediaElement to handle it. By this way, we can make sure that media playback
  * starts after loading screen is displayed.
@@ -755,7 +680,6 @@ sampleplayer.CastPlayer.prototype.loadAudio_ = function(info) {
  * @private
  */
 sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
-  console.log('gvd 000000000000 loadVideo_');
   var self = this;
   var protocolFunc = null;
   var url = info.message.media.contentId;
@@ -764,13 +688,11 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
 
   this.letPlayerHandleAutoPlay_(info);
   if (!protocolFunc) {
-    this.log_('loadVideo_: using MediaElement');
     this.mediaElement_.addEventListener('stalled', this.bufferingHandler_,
         false);
     this.mediaElement_.addEventListener('waiting', this.bufferingHandler_,
         false);
   } else {
-    this.log_('loadVideo_: using Media Player Library');
     // When MPL is used, buffering status should be detected by
     // getState()['underflow]'
     this.mediaElement_.removeEventListener('stalled', this.bufferingHandler_);
@@ -785,9 +707,8 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         self.mediaElement_.dispatchEvent(new Event('error'));
       }
     };
-    this.log_('Regular video load');
     this.host_ = new cast.player.api.Host({
-      // gvd 'url': url,
+      'url': '', // gvd
       'mediaElement': this.mediaElement_
     });
     var self = this;
@@ -1380,7 +1301,6 @@ sampleplayer.CastPlayer.prototype.onStop_ = function(event) {
 sampleplayer.CastPlayer.prototype.onEnded_ = function() {
   this.log_('onEnded');
   this.setState_(sampleplayer.State.IDLE, true);
-  this.hidePreviewMode_();
 };
 
 
@@ -1392,7 +1312,6 @@ sampleplayer.CastPlayer.prototype.onEnded_ = function() {
 sampleplayer.CastPlayer.prototype.onAbort_ = function() {
   this.log_('onAbort');
   this.setState_(sampleplayer.State.IDLE, true);
-  this.hidePreviewMode_();
 };
 
 
@@ -1428,10 +1347,6 @@ sampleplayer.CastPlayer.prototype.updateProgress_ = function() {
       this.totalTimeElement_.innerText = sampleplayer.formatDuration_(totalTime);
       this.progressBarInnerElement_.style.width = pct + '%';
       this.progressBarThumbElement_.style.left = pct + '%';
-      // Handle preview mode
-      if (this.displayPreviewMode_) {
-        this.previewModeTimerElement_.innerText = "" + Math.round(totalTime-curTime);
-      }
     }
   }
 };
@@ -1494,21 +1409,6 @@ sampleplayer.CastPlayer.prototype.onPreload_ = function(event) {
   var loadRequestData =
       /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data);
   return this.preload(loadRequestData.media);
-};
-
-
-/**
- * Called when we receive a CANCEL_PRELOAD message.
- *
- * @see castplayer.CastPlayer#load
- * @param {cast.receiver.MediaManager.Event} event The load event.
- * @return {boolean} Whether the item can be preloaded.
- * @private
- */
-sampleplayer.CastPlayer.prototype.onCancelPreload_ = function(event) {
-  this.log_('onCancelPreload_');
-  this.hidePreviewMode_();
-  return true;
 };
 
 
@@ -1721,28 +1621,6 @@ sampleplayer.getProtocolFunction_ = function(mediaInformation) {
  */
 sampleplayer.supportsPreload_ = function(media) {
   return sampleplayer.getProtocolFunction_(media) != null;
-};
-
-
-/**
- * Returns true if the preview UI should be shown for the type of media
- * although the media can not be preloaded.
- *
- * @param {!cast.receiver.media.MediaInformation} media The media information.
- * @return {boolean} whether the media can be previewed.
- * @private
- */
-sampleplayer.canDisplayPreview_ = function(media) {
-  var contentId = media.contentId || '';
-  var contentUrlPath = sampleplayer.getPath_(contentId);
-  if (sampleplayer.getExtension_(contentUrlPath) === 'mp4') {
-    return true;
-  } else if (sampleplayer.getExtension_(contentUrlPath) === 'ogv') {
-    return true;
-  } else if (sampleplayer.getExtension_(contentUrlPath) === 'webm') {
-    return true;
-  }
-  return false;
 };
 
 
