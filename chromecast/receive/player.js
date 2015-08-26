@@ -284,8 +284,8 @@ sampleplayer.CastPlayer = function(element) {
                                               this.mediaManager_);
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.apiKey = 'apiKey';
-  streamRequest.assetKey = 'assetKey';
-  streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.EVENT;
+  streamRequest.assetKey = 'nSDLa3IJTLCecel2IaECyA';
+  streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.EVENT;// change to asset type gvd
   streamRequest.attemptPreroll = false;
   streamRequest.customParameters = 'bar=0&foo=1';
   //this.receiverStreamManager_.addEventListener(type, func, false)
