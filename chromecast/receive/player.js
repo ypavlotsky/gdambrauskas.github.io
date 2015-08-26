@@ -273,7 +273,6 @@ sampleplayer.CastPlayer = function(element) {
         console.log(event.getData())
         var streamUrl = event.getData().streamUrl;
         var subtitles = event.getData().subtitles;
-        this.player_.getHost().url = streamUrl;
         /*
          Object
          streamUrl: "http://truman-qa.sandbox.google.com/ssai/master/event/nSDLa3IJTLCecel2IaECyA/session/05222fd5-aed3-4652-ab43-74077295a810/master.m3u8"subtitles: Array[0]
@@ -1397,22 +1396,6 @@ sampleplayer.CastPlayer.prototype.onVisibilityChanged_ = function(event) {
 
 
 /**
- * Called when we receive a PRELOAD message.
- *
- * @see castplayer.CastPlayer#load
- * @param {cast.receiver.MediaManager.Event} event The load event.
- * @return {boolean} Whether the item can be preloaded.
- * @private
- */
-sampleplayer.CastPlayer.prototype.onPreload_ = function(event) {
-  this.log_('onPreload_');
-  var loadRequestData =
-      /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data);
-  return this.preload(loadRequestData.media);
-};
-
-
-/**
  * Called when we receive a LOAD message. Calls load().
  *
  * @see sampleplayer#load
@@ -1420,7 +1403,7 @@ sampleplayer.CastPlayer.prototype.onPreload_ = function(event) {
  * @private
  */
 sampleplayer.CastPlayer.prototype.onLoad_ = function(event) {
-  this.log_('onLoad_');
+  console.log('gvd sampleplayer.CastPlayer.prototype.onLoad_')
   this.cancelDeferredPlay_('new media is loaded');
   this.load(new cast.receiver.MediaManager.LoadInfo(
       /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data),
@@ -1613,18 +1596,6 @@ sampleplayer.getProtocolFunction_ = function(mediaInformation) {
 
 
 /**
- * Returns true if the media can be preloaded.
- *
- * @param {!cast.receiver.media.MediaInformation} media The media information.
- * @return {boolean} whether the media can be preloaded.
- * @private
- */
-sampleplayer.supportsPreload_ = function(media) {
-  return sampleplayer.getProtocolFunction_(media) != null;
-};
-
-
-/**
  * Returns the type of player to use for the given media.
  * By default this looks at the media's content type, but falls back
  * to file extension if not set.
@@ -1731,51 +1702,6 @@ sampleplayer.transition_ = function(element, time, something) {
       something();
       sampleplayer.fadeIn_(element, time / 2.0);
     });
-  }
-};
-
-
-/**
- * Preloads media data that can be preloaded.
- *
- * @param {!cast.receiver.media.MediaInformation} media The media to load.
- * @param {function()} doneFunc The function to call when done.
- * @private
- */
-sampleplayer.preload_ = function(media, doneFunc) {
-  if (sampleplayer.isCastForAudioDevice_()) {
-    // No preloading for Cast for Audio devices
-    doneFunc();
-    return;
-  }
-
-  var imagesToPreload = [];
-  var counter = 0;
-  var images = [];
-  function imageLoaded() {
-      if (++counter === imagesToPreload.length) {
-        doneFunc();
-      }
-  }
-
-  // try to preload image metadata
-  var thumbnailUrl = sampleplayer.getMediaImageUrl_(media);
-  if (thumbnailUrl) {
-    imagesToPreload.push(thumbnailUrl);
-  }
-  if (imagesToPreload.length === 0) {
-    doneFunc();
-  } else {
-    for (var i = 0; i < imagesToPreload.length; i++) {
-      images[i] = new Image();
-      images[i].src = imagesToPreload[i];
-      images[i].onload = function() {
-        imageLoaded();
-      };
-      images[i].onerror = function() {
-        imageLoaded();
-      };
-    }
   }
 };
 
