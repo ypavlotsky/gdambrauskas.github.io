@@ -621,7 +621,7 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
   };
   var self = this;
   host.processMetadata = function(type, data, timestamp) {
-    console.log("gvd self.receiverStreamManager_ "+self.receiverStreamManager_)
+    console.log("gvd self.receiverStreamManager_ ")
     self.receiverStreamManager_.processMetadata(type, data, timestamp);
   };
   gvdrequeststream(this.receiverStreamManager_);
@@ -864,7 +864,7 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
       });
       var self = this;
       host.processMetadata = function(type, data, timestamp) {
-        console.log("gvd self.receiverStreamManager_ "+self.receiverStreamManager_)
+        console.log("gvd self.receiverStreamManager_ "+)
         self.receiverStreamManager_.processMetadata(type, data, timestamp);
       };
       gvdrequeststream(this.receiverStreamManager_);
@@ -1035,7 +1035,7 @@ sampleplayer.CastPlayer.prototype.processTtmlCues_ =
       });
       var self = this;
       host.processMetadata = function(type, data, timestamp) {
-        console.log("gvd self.receiverStreamManager_ "+self.receiverStreamManager_)
+        console.log("gvd self.receiverStreamManager_ ")
         self.receiverStreamManager_.processMetadata(type, data, timestamp);
       };
       gvdrequeststream(this.receiverStreamManager_);
