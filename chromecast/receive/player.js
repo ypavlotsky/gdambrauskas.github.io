@@ -600,7 +600,7 @@ sampleplayer.CastPlayer.prototype.hidePreviewMode_ = function() {
  * @private
  */
 sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
-  this.log_('preloadVideo_');
+  this.log_('gvd 000000000000 preloadVideo_');
   var self = this;
   var url = mediaInformation.contentId;
   var protocolFunc = sampleplayer.getProtocolFunction_(mediaInformation);
@@ -821,7 +821,7 @@ sampleplayer.CastPlayer.prototype.loadAudio_ = function(info) {
  * @private
  */
 sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
-  this.log_('loadVideo_');
+  this.log_('gvd 000000000000 loadVideo_');
   var self = this;
   var protocolFunc = null;
   var url = info.message.media.contentId;
@@ -1009,6 +1009,7 @@ sampleplayer.CastPlayer.prototype.maybeLoadEmbeddedTracksMetadata_ =
  */
 sampleplayer.CastPlayer.prototype.processTtmlCues_ =
     function(activeTrackIds, tracks) {
+  this.log_('gvd 000000000000 processTtmlCues_');
   if (activeTrackIds.length == 0) {
     return;
   }
