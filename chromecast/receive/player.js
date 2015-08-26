@@ -49,10 +49,10 @@
 function gvdrequeststream(m) {
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.apiKey = 'apiKey';
-  streamRequest.assetKey = 'assetKey';
-  StreamRequest.AssetType = google.ima.cast.StreamRequest.AssetType.EVENT;
+  streamRequest.assetKey = 'nSDLa3IJTLCecel2IaECyA';
+  streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
   streamRequest.attemptPreroll = false;
-  streamRequest.customParameters = 'bar=1&foo=2';
+  streamRequest.customParameters = 'bar=0&foo=1';
   //this.receiverStreamManager_.addEventListener(type, func, false)
   console.log('gvd 0000 streamRequest.apiKey '+streamRequest.apiKey)
   console.log(streamRequest)
@@ -285,7 +285,7 @@ sampleplayer.CastPlayer = function(element) {
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.apiKey = 'apiKey';
   streamRequest.assetKey = 'nSDLa3IJTLCecel2IaECyA';
-  streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;// change to asset type gvd
+  streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
   streamRequest.attemptPreroll = false;
   streamRequest.customParameters = 'bar=0&foo=1';
   //this.receiverStreamManager_.addEventListener(type, func, false)
