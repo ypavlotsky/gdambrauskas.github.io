@@ -286,8 +286,9 @@ sampleplayer.CastPlayer = function(element) {
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED,
       function(event) {
-        console.log("gvd google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED ")
-        console.log(event)
+        console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED ")
+        console.log(event.type)
+        console.log(event.getData())
         // gvd self.onReceiverStreamManagerEvent_(),
       },
       false);
