@@ -282,13 +282,21 @@ sampleplayer.CastPlayer = function(element) {
   this.receiverStreamManager_ =
     new google.ima.cast.ReceiverStreamManager(this.mediaElement_,
                                               this.mediaManager_);
+  var self = this;
+  this.receiverStreamManager_.addEventListener(
+      google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED,
+      function(event) {
+        console.log("gvd google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED ")
+        console.log(event)
+        // gvd self.onReceiverStreamManagerEvent_(),
+      },
+      false);
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.apiKey = 'apiKey';
   streamRequest.assetKey = 'nSDLa3IJTLCecel2IaECyA';
   streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
   streamRequest.attemptPreroll = false;
   streamRequest.customParameters = 'bar=0&foo=1';
-  //this.receiverStreamManager_.addEventListener(type, func, false)
   //this.receiverStreamManager_.requestStream(streamRequest);
 
   /**
