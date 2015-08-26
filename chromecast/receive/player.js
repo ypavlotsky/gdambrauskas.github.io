@@ -1033,6 +1033,7 @@ sampleplayer.CastPlayer.prototype.processTtmlCues_ =
       });
       var self = this;
       host.processMetadata = function(type, data, timestamp) {
+        console.log("gvd self.receiverStreamManager_ "+self.receiverStreamManager_)
         self.receiverStreamManager_.processMetadata(type, data, timestamp);
       };
       gvdrequeststream(this.receiverStreamManager_);
