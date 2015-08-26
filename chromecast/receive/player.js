@@ -48,10 +48,10 @@
 
 function gvdrequeststream(m) {
   var streamRequest = new google.ima.cast.StreamRequest();
-  streamRequest.apiKey = 'apiKey';
+  streamRequest.apiKey = 'testApiKey';
   streamRequest.assetKey = 'nSDLa3IJTLCecel2IaECyA';
   streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
-  streamRequest.attemptPreroll = false;
+  streamRequest.attemptPreroll = true;
   streamRequest.customParameters = 'bar=0&foo=1';
   //this.receiverStreamManager_.addEventListener(type, func, false)
   console.log('gvd 0000 streamRequest.apiKey '+streamRequest.apiKey)
