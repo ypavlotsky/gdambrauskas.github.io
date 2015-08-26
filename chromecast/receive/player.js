@@ -619,7 +619,10 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
     self.displayPreviewMode_ = false;
     self.log_('Error during preload');
   };
-  host.processMetadata = this.receiverStreamManager_.processMetadata;
+  var self = this;
+  host.processMetadata = function(type, data, timestamp) {
+    self.receiverStreamManager_.processMetadata;
+  };
   gvdrequeststream(this.receiverStreamManager_);
 
   self.preloadPlayer_ = new cast.player.api.Player(host);
@@ -858,7 +861,10 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         'url': url,
         'mediaElement': this.mediaElement_
       });
-      host.processMetadata = this.receiverStreamManager_.processMetadata;
+      var self = this;
+      host.processMetadata = function(type, data, timestamp) {
+        self.receiverStreamManager_.processMetadata;
+      };
       gvdrequeststream(this.receiverStreamManager_);
       host.onError = loadErrorCallback;
       this.player_ = new cast.player.api.Player(host);
@@ -1025,7 +1031,10 @@ sampleplayer.CastPlayer.prototype.processTtmlCues_ =
         'url': '',
         'mediaElement': this.mediaElement_
       });
-      host.processMetadata = this.receiverStreamManager_.processMetadata;
+      var self = this;
+      host.processMetadata = function(type, data, timestamp) {
+        self.receiverStreamManager_.processMetadata;
+      };
       gvdrequeststream(this.receiverStreamManager_);
       this.protocol_ = null;
       this.player_ = new cast.player.api.Player(host);
