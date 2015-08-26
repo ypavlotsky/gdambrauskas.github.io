@@ -198,12 +198,6 @@ sampleplayer.CastPlayer = function(element) {
   this.player_ = null;
 
   /**
-   * Media player used to preload content.
-   * @private {cast.player.api.Player}
-   */
-  this.preloadPlayer_ = null;
-
-  /**
    * Text Tracks currently supported.
    * @private {?sampleplayer.TextTrackType}
    */
@@ -540,39 +534,6 @@ sampleplayer.CastPlayer.prototype.start = function() {
 
 
 /**
- * Preloads the given data.
- *
- * @param {!cast.receiver.media.MediaInformation} mediaInformation The
- *     asset media information.
- * @return {boolean} Whether the media can be preloaded.
- * @export
- */
-sampleplayer.CastPlayer.prototype.preload = function(mediaInformation) {
-  this.log_('preload');
-  // For video formats that cannot be preloaded (mp4...), display preview UI.
-  if (sampleplayer.canDisplayPreview_(mediaInformation || {})) {
-    this.showPreviewMode_(mediaInformation);
-    return true;
-  }
-  if (!sampleplayer.supportsPreload_(mediaInformation || {})) {
-    this.log_('preload: no supportsPreload_');
-    return false;
-  }
-  if (this.preloadPlayer_) {
-    this.preloadPlayer_.unload();
-    this.preloadPlayer_ = null;
-  }
-  // Only videos are supported for now
-  var couldPreload = this.preloadVideo_(mediaInformation);
-  if (couldPreload) {
-    this.showPreviewMode_(mediaInformation);
-  }
-  this.log_('preload: couldPreload=' + couldPreload);
-  return couldPreload;
-};
-
-
-/**
  * Display preview mode metadata.
  *
  * @param {boolean} show whether player is showing preview mode metadata
@@ -604,47 +565,6 @@ sampleplayer.CastPlayer.prototype.showPreviewMode_ = function(mediaInformation) 
 sampleplayer.CastPlayer.prototype.hidePreviewMode_ = function() {
   this.showPreviewModeMetadata(false);
   this.displayPreviewMode_ = false;
-};
-
-
-/**
- * Preloads some video content.
- *
- * @param {!cast.receiver.media.MediaInformation} mediaInformation The
- *     asset media information.
- * @return {boolean} Whether the video can be preloaded.
- * @private
- */
-sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
-  console.log('gvd 000000000000 preloadVideo_');
-  var self = this;
-  var url = mediaInformation.contentId;
-  var protocolFunc = sampleplayer.getProtocolFunction_(mediaInformation);
-  if (!protocolFunc) {
-    this.log_('No protocol found for preload');
-    return false;
-  }
-  this.host_ = new cast.player.api.Host({
-    // gvd 'url': url,
-    'mediaElement': self.mediaElement_
-  });
-  this.host_.onError = function() {
-    self.preloadPlayer_.unload();
-    self.preloadPlayer_ = null;
-    self.showPreviewModeMetadata(false);
-    self.displayPreviewMode_ = false;
-    self.log_('Error during preload');
-  };
-  var self = this;
-  this.host_.processMetadata = function(type, data, timestamp) {
-    console.log("gvd self.receiverStreamManager_ ")
-    self.receiverStreamManager_.processMetadata(type, data, timestamp);
-  };
-  gvdrequeststream(this.receiverStreamManager_);
-
-  self.preloadPlayer_ = new cast.player.api.Player(this.host_);
-  self.preloadPlayer_.preload(protocolFunc(this.host_));
-  return true;
 };
 
 /**
@@ -684,8 +604,6 @@ sampleplayer.CastPlayer.prototype.load = function(info) {
     self.playerReady_ = false;
     self.metadataLoaded_ = false;
     self.loadMetadata_(media);
-    self.showPreviewModeMetadata(false);
-    self.displayPreviewMode_ = false;
     sampleplayer.preload_(media, function() {
       self.log_('preloaded=' + preloaded);
       if (preloaded) {
@@ -867,35 +785,20 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         self.mediaElement_.dispatchEvent(new Event('error'));
       }
     };
-    if (!this.preloadPlayer_ || (this.preloadPlayer_.getHost &&
-        this.preloadPlayer_.getHost().url != url)) {
-      if (this.preloadPlayer_) {
-        this.preloadPlayer_.unload();
-        this.preloadPlayer_ = null;
-      }
-      this.log_('Regular video load');
-      this.host_ = new cast.player.api.Host({
-        // gvd 'url': url,
-        'mediaElement': this.mediaElement_
-      });
-      var self = this;
-      this.host_.processMetadata = function(type, data, timestamp) {
-        self.receiverStreamManager_.processMetadata(type, data, timestamp);
-      };
-      gvdrequeststream(this.receiverStreamManager_);
-      this.host_.onError = loadErrorCallback;
-      this.player_ = new cast.player.api.Player(this.host_);
-      this.player_.load(protocolFunc(this.host_));
-    } else {
-      this.log_('Preloaded video load');
-      this.player_ = this.preloadPlayer_;
-      this.preloadPlayer_ = null;
-      // Replace the "preload" error callback with the "load" error callback
-      this.player_.getHost().onError = loadErrorCallback;
-      this.player_.load();
-      wasPreloaded = true;
-    }
-  }
+    this.log_('Regular video load');
+    this.host_ = new cast.player.api.Host({
+      // gvd 'url': url,
+      'mediaElement': this.mediaElement_
+    });
+    var self = this;
+    this.host_.processMetadata = function(type, data, timestamp) {
+      self.receiverStreamManager_.processMetadata(type, data, timestamp);
+    };
+    gvdrequeststream(this.receiverStreamManager_);
+    this.host_.onError = loadErrorCallback;
+    this.player_ = new cast.player.api.Player(this.host_);
+    this.player_.load(protocolFunc(this.host_));
+}
   this.loadMediaManagerInfo_(info, !!protocolFunc);
   return wasPreloaded;
 };
