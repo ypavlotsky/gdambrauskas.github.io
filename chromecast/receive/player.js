@@ -553,6 +553,7 @@ sampleplayer.CastPlayer.prototype.load = function(info) {
     self.playerReady_ = false;
     self.metadataLoaded_ = false;
     self.loadMetadata_(media);
+    /* gvd
     sampleplayer.preload_(media, function() {
       self.log_('preloaded=' + preloaded);
       if (preloaded) {
@@ -579,7 +580,7 @@ sampleplayer.CastPlayer.prototype.load = function(info) {
           }
         });
       }
-    });
+    });*/
   }
 };
 
