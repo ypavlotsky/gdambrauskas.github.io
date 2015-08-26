@@ -648,7 +648,7 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
 };
 
 /**
- * Loads the given data.
+ * Loads the given data. Request comes from sender app.
  *
  * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
  * @export
@@ -678,9 +678,11 @@ sampleplayer.CastPlayer.prototype.load = function(info) {
         self.loadAudio_(info);
         break;
       case sampleplayer.Type.VIDEO:
+        console.log("gvd loading video yyyyyyyyyy")
         preloaded = self.loadVideo_(info);
         break;
     }
+    console.log("gvd nnnnnnnnnnnnnnnnot here")
     self.playerReady_ = false;
     self.metadataLoaded_ = false;
     self.loadMetadata_(media);
@@ -837,7 +839,6 @@ sampleplayer.CastPlayer.prototype.loadAudio_ = function(info) {
  * @private
  */
 sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
-  console.log('gvd 000000000000 loadVideo_');
   var self = this;
   var protocolFunc = null;
   var url = info.message.media.contentId;
@@ -846,13 +847,11 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
 
   this.letPlayerHandleAutoPlay_(info);
   if (!protocolFunc) {
-    this.log_('loadVideo_: using MediaElement');
     this.mediaElement_.addEventListener('stalled', this.bufferingHandler_,
         false);
     this.mediaElement_.addEventListener('waiting', this.bufferingHandler_,
         false);
   } else {
-    this.log_('loadVideo_: using Media Player Library');
     // When MPL is used, buffering status should be detected by
     // getState()['underflow]'
     this.mediaElement_.removeEventListener('stalled', this.bufferingHandler_);
@@ -873,7 +872,6 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         this.preloadPlayer_.unload();
         this.preloadPlayer_ = null;
       }
-      this.log_('Regular video load');
       var host = new cast.player.api.Host({
         'url': url,
         'mediaElement': this.mediaElement_
