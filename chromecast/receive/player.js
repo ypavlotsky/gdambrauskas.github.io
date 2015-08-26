@@ -282,6 +282,23 @@ sampleplayer.CastPlayer = function(element) {
   this.receiverStreamManager_ =
     new google.ima.cast.ReceiverStreamManager(this.mediaElement_,
                                               this.mediaManager_);
+  var self = this;
+  this.receiverStreamManager_.addEventListener(
+      google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED,
+      function(event) {
+        console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED ")
+        console.log(event.type)
+        console.log(event.getData())
+        var streamUrl = event.getData().streamUrl;
+        var subtitles = event.getData().subtitles;
+        this.player_.getHost().url = streamUrl;
+        /*
+         Object
+         streamUrl: "http://truman-qa.sandbox.google.com/ssai/master/event/nSDLa3IJTLCecel2IaECyA/session/05222fd5-aed3-4652-ab43-74077295a810/master.m3u8"subtitles: Array[0]
+         */
+        // gvd self.onReceiverStreamManagerEvent_(),
+      },
+      false);
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.apiKey = 'apiKey';
   streamRequest.assetKey = 'nSDLa3IJTLCecel2IaECyA';
@@ -621,7 +638,6 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
   };
   var self = this;
   host.processMetadata = function(type, data, timestamp) {
-    console.log("gvd self.receiverStreamManager_ ")
     self.receiverStreamManager_.processMetadata(type, data, timestamp);
   };
   gvdrequeststream(this.receiverStreamManager_);
@@ -1035,7 +1051,6 @@ sampleplayer.CastPlayer.prototype.processTtmlCues_ =
       });
       var self = this;
       host.processMetadata = function(type, data, timestamp) {
-        console.log("gvd self.receiverStreamManager_ ")
         self.receiverStreamManager_.processMetadata(type, data, timestamp);
       };
       gvdrequeststream(this.receiverStreamManager_);
