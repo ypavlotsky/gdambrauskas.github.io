@@ -718,6 +718,7 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
     gvdrequeststream(this.receiverStreamManager_);
     this.host_.onError = loadErrorCallback;
     this.player_ = new cast.player.api.Player(this.host_);
+    console.log("gvd SHOULD be playing")
     this.player_.load(protocolFunc(this.host_));
 }
   this.loadMediaManagerInfo_(info, !!protocolFunc);
