@@ -708,7 +708,7 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
       }
     };
     this.host_ = new cast.player.api.Host({
-      'url': '', // gvd
+      'url': 'http://truman-qa.sandbox.google.com/ssai/master/event/nSDLa3IJTLCecel2IaECyA/session/05222fd5-aed3-4652-ab43-74077295a810/master.m3u8', // gvd
       'mediaElement': this.mediaElement_
     });
     var self = this;
