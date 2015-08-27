@@ -782,10 +782,12 @@ sampleplayer.CastPlayer.prototype.loadPreviewModeMetadata_ = function(media) {
  * @private
  */
 sampleplayer.CastPlayer.prototype.letPlayerHandleAutoPlay_ = function(info) {
+  /* gvd
   var autoplay = info.message.autoplay;
   info.message.autoplay = false;
+  */
   this.mediaElement_.autoplay = false;
-  this.playerAutoPlay_ = autoplay == undefined ? true : autoplay;
+  this.playerAutoPlay_ = true ;// gvd autoplay == undefined ? true : autoplay;
 };
 
 
@@ -870,13 +872,14 @@ sampleplayer.CastPlayer.prototype.loadStitchedVideo_ = function(info) {
   var protocolFunc = sampleplayer.getProtocolFunction_(info);
   var wasPreloaded = false;
 
-  // gvd this.letPlayerHandleAutoPlay_(info);
+  this.letPlayerHandleAutoPlay_(info);
   if (!protocolFunc) {
     this.mediaElement_.addEventListener('stalled', this.bufferingHandler_,
         false);
     this.mediaElement_.addEventListener('waiting', this.bufferingHandler_,
         false);
   } else {
+    console.log("gvd mpl")
     // When MPL is used, buffering status should be detected by
     // getState()['underflow]'
     this.mediaElement_.removeEventListener('stalled', this.bufferingHandler_);
