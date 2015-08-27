@@ -682,39 +682,36 @@ sampleplayer.CastPlayer.prototype.load = function(info) {
         preloaded = self.loadVideo_(info);
         break;
     }
-    console.log("gvd nnnnnnnnnnnnnnnnot here")
     self.playerReady_ = false;
     self.metadataLoaded_ = false;
     self.loadMetadata_(media);
     self.showPreviewModeMetadata(false);
     self.displayPreviewMode_ = false;
-    sampleplayer.preload_(media, function() {
-      self.log_('preloaded=' + preloaded);
-      if (preloaded) {
-        // Data is ready to play so transiton directly to playing.
-        self.setState_(sampleplayer.State.PLAYING, false);
+    console.log("gvd nnnnnnnnnnnnnnnnot here preloaded "+preloaded)
+    if (preloaded) {
+      // Data is ready to play so transiton directly to playing.
+      self.setState_(sampleplayer.State.PLAYING, false);
+      self.playerReady_ = true;
+      self.maybeSendLoadCompleted_(info);
+      // Don't display metadata again, since autoplay already did that.
+      self.deferPlay_(0);
+      self.playerAutoPlay_ = false;
+    } else {
+      sampleplayer.transition_(self.element_, sampleplayer.TRANSITION_DURATION_, function() {
+        self.setState_(sampleplayer.State.LOADING, false);
+        // Only send load completed after we reach this point so the media
+        // manager state is still loading and the sender can't send any PLAY
+        // messages
         self.playerReady_ = true;
         self.maybeSendLoadCompleted_(info);
-        // Don't display metadata again, since autoplay already did that.
-        self.deferPlay_(0);
-        self.playerAutoPlay_ = false;
-      } else {
-        sampleplayer.transition_(self.element_, sampleplayer.TRANSITION_DURATION_, function() {
-          self.setState_(sampleplayer.State.LOADING, false);
-          // Only send load completed after we reach this point so the media
-          // manager state is still loading and the sender can't send any PLAY
-          // messages
-          self.playerReady_ = true;
-          self.maybeSendLoadCompleted_(info);
-          if (self.playerAutoPlay_) {
-            // Make sure media info is displayed long enough before playback
-            // starts.
-            self.deferPlay_(sampleplayer.MEDIA_INFO_DURATION_);
-            self.playerAutoPlay_ = false;
-          }
-        });
-      }
-    });
+        if (self.playerAutoPlay_) {
+          // Make sure media info is displayed long enough before playback
+          // starts.
+          self.deferPlay_(sampleplayer.MEDIA_INFO_DURATION_);
+          self.playerAutoPlay_ = false;
+        }
+      });
+    }
   }
 };
 
@@ -1947,51 +1944,6 @@ sampleplayer.transition_ = function(element, time, something) {
       something();
       sampleplayer.fadeIn_(element, time / 2.0);
     });
-  }
-};
-
-
-/**
- * Preloads media data that can be preloaded.
- *
- * @param {!cast.receiver.media.MediaInformation} media The media to load.
- * @param {function()} doneFunc The function to call when done.
- * @private
- */
-sampleplayer.preload_ = function(media, doneFunc) {
-  if (sampleplayer.isCastForAudioDevice_()) {
-    // No preloading for Cast for Audio devices
-    doneFunc();
-    return;
-  }
-
-  var imagesToPreload = [];
-  var counter = 0;
-  var images = [];
-  function imageLoaded() {
-      if (++counter === imagesToPreload.length) {
-        doneFunc();
-      }
-  }
-
-  // try to preload image metadata
-  var thumbnailUrl = sampleplayer.getMediaImageUrl_(media);
-  if (thumbnailUrl) {
-    imagesToPreload.push(thumbnailUrl);
-  }
-  if (imagesToPreload.length === 0) {
-    doneFunc();
-  } else {
-    for (var i = 0; i < imagesToPreload.length; i++) {
-      images[i] = new Image();
-      images[i].src = imagesToPreload[i];
-      images[i].onload = function() {
-        imageLoaded();
-      };
-      images[i].onerror = function() {
-        imageLoaded();
-      };
-    }
   }
 };
 
