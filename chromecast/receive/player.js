@@ -901,6 +901,7 @@ sampleplayer.CastPlayer.prototype.loadStitchedVideo_ = function(info) {
     });
     var self = this;
     host.processMetadata = function(type, data, timestamp) {
+      console.log("gvd metadata firing "+type + " "+data)
       self.receiverStreamManager_.processMetadata(type, data, timestamp);
     };
     host.onError = loadErrorCallback;
