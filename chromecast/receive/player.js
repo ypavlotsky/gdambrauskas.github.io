@@ -1630,7 +1630,8 @@ sampleplayer.CastPlayer.prototype.onCancelPreload_ = function(event) {
 sampleplayer.CastPlayer.prototype.onLoad_ = function(event) {
   this.log_('onLoad_');
   this.cancelDeferredPlay_('new media is loaded');
-  this.load(new cast.receiver.MediaManager.LoadInfo(
+  return; // gvd
+  this.load(new cast.receiver.MediaManager.LoadInfo( // gvd check out how this is used!
       /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data),
       event.senderId));
 };
