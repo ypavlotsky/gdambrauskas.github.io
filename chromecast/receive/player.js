@@ -291,7 +291,8 @@ sampleplayer.CastPlayer = function(element) {
         console.log(event.getData())
         var streamUrl = event.getData().streamUrl;
         var subtitles = event.getData().subtitles;
-        this.player_.getHost().url = streamUrl;
+        var mediaInfo = new chrome.cast.media.MediaInfo(streamUrl);
+        self.loadVideo_(mediaInfo);
         /*
          Object
          streamUrl: "http://truman-qa.sandbox.google.com/ssai/master/event/nSDLa3IJTLCecel2IaECyA/session/05222fd5-aed3-4652-ab43-74077295a810/master.m3u8"subtitles: Array[0]
@@ -679,14 +680,13 @@ sampleplayer.CastPlayer.prototype.load = function(info) {
         break;
       case sampleplayer.Type.VIDEO:
         console.log("gvd loading video yyyyyyyyyy")
-        preloaded = self.loadVideo_(info);
+        preloaded = gvdrequeststream(this.receiverStreamManager_);// gvd self.loadVideo_(info);
         break;
     }
     self.playerReady_ = false;
     self.metadataLoaded_ = false;
     self.showPreviewModeMetadata(false);
     self.displayPreviewMode_ = false;
-    console.log("gvd nnnnnnnnnnnnnnnnot here preloaded "+preloaded)
     if (preloaded) {
       // gvd get rid of preloaded
 
@@ -832,33 +832,18 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         self.mediaElement_.dispatchEvent(new Event('error'));
       }
     };
-    if (!this.preloadPlayer_ || (this.preloadPlayer_.getHost &&
-        this.preloadPlayer_.getHost().url != url)) {
-      if (this.preloadPlayer_) {
-        this.preloadPlayer_.unload();
-        this.preloadPlayer_ = null;
-      }
-      var host = new cast.player.api.Host({
-        'url': url,
-        'mediaElement': this.mediaElement_
-      });
-      var self = this;
-      host.processMetadata = function(type, data, timestamp) {
-        self.receiverStreamManager_.processMetadata(type, data, timestamp);
-      };
-      gvdrequeststream(this.receiverStreamManager_);
-      host.onError = loadErrorCallback;
-      this.player_ = new cast.player.api.Player(host);
-      this.player_.load(protocolFunc(host));
-    } else {
-      this.log_('Preloaded video load');
-      this.player_ = this.preloadPlayer_;
-      this.preloadPlayer_ = null;
-      // Replace the "preload" error callback with the "load" error callback
-      this.player_.getHost().onError = loadErrorCallback;
-      this.player_.load();
-      wasPreloaded = true;
-    }
+
+    var host = new cast.player.api.Host({
+      'url': url,
+      'mediaElement': this.mediaElement_
+    });
+    var self = this;
+    host.processMetadata = function(type, data, timestamp) {
+      self.receiverStreamManager_.processMetadata(type, data, timestamp);
+    };
+    host.onError = loadErrorCallback;
+    this.player_ = new cast.player.api.Player(host);
+    this.player_.load(protocolFunc(host));
   }
   this.loadMediaManagerInfo_(info, !!protocolFunc);
   return wasPreloaded;
