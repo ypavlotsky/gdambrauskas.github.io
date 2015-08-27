@@ -92,7 +92,7 @@ The overlay layer holds:
         'url': 'http://truman-qa.sandbox.google.com/ssai/media/event/nSDLa3IJTLCecel2IaECyA/session/db5c544a-77bc-422f-a677-7595745a3dc8/bandwidth/1428000/media.m3u8',
         'mediaElement': mediaElement
       });
-      var player_ = new cast.player.api.Player(host);
+      var player = new cast.player.api.Player(host);
       player.load(cast.player.api.CreateHlsStreamingProtocol(host));
       player.playWhenHaveEnoughData();
       //new sampleplayer.CastPlayer(playerDiv).start();
