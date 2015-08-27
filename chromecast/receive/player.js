@@ -292,6 +292,7 @@ sampleplayer.CastPlayer = function(element) {
         var streamUrl = event.getData().streamUrl;
         var subtitles = event.getData().subtitles;
         var mediaInfo = new chrome.cast.media.MediaInfo(streamUrl);
+        console.log("gvd lading video with streamUrl "+streamUrl)
         self.loadVideo_(mediaInfo);
         /*
          Object
