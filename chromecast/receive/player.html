@@ -47,7 +47,7 @@ The overlay layer holds:
 <body style="margin: 0">
     <div id="player" class="player">
         <div class="media">
-            <video></video>
+            <video id='mediaElement'></video>
         </div>
         <div class="logo"></div>
         <div class="spinner"></div>
@@ -86,7 +86,17 @@ The overlay layer holds:
     </div>
     <script>
       var playerDiv = document.getElementById('player');
-      new sampleplayer.CastPlayer(playerDiv).start();
+      var mediaElement = document.getElementById('mediaElement');
+
+      var host = new cast.player.api.Host({
+        'url': 'http://truman-qa.sandbox.google.com/ssai/media/event/nSDLa3IJTLCecel2IaECyA/session/db5c544a-77bc-422f-a677-7595745a3dc8/bandwidth/1428000/media.m3u8',
+        'mediaElement': mediaElement
+      });
+      var player_ = new cast.player.api.Player(host);
+      player.load(cast.player.api.CreateHlsStreamingProtocol(host));
+      player.playWhenHaveEnoughData();
+
+      //new sampleplayer.CastPlayer(playerDiv).start();
     </script>
 </body>
 </html>
