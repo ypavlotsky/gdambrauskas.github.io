@@ -896,7 +896,7 @@ sampleplayer.CastPlayer.prototype.loadStitchedVideo_ = function(info) {
     };
 
     var host = new cast.player.api.Host({
-      'url': url,
+      'url': 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8', // gvd url,
       'mediaElement': this.mediaElement_
     });
     var self = this;
