@@ -81,8 +81,8 @@ The overlay layer holds:
         window.messageBus.onMessage = function(event) {
           console.log('Message [' + event.senderId + ']: ' + event.data);
           // display the message from the sender
-          console.log(event.data);
-          playMedia(event.senderId)
+          console.log('event.data ' + event.data);
+          playMedia(event.data)
         }
         // initialize the CastReceiverManager with an application status message
         window.castReceiverManager.start({statusText: "Application is starting"});
