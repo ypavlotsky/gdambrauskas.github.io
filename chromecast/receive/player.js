@@ -298,7 +298,7 @@ sampleplayer.CastPlayer = function(element) {
         // mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
         mediaInfo.contentType = 'application/x-mpegurl';
         console.log("gvd lading video with streamUrl1 "+streamUrl)
-        self.loadVideo_(mediaInfo);
+        self.loadStitchedVideo_(mediaInfo);
         /*
          Object
          streamUrl: "http://truman-qa.sandbox.google.com/ssai/master/event/nSDLa3IJTLCecel2IaECyA/session/05222fd5-aed3-4652-ab43-74077295a810/master.m3u8"subtitles: Array[0]
@@ -782,7 +782,6 @@ sampleplayer.CastPlayer.prototype.loadPreviewModeMetadata_ = function(media) {
  * @private
  */
 sampleplayer.CastPlayer.prototype.letPlayerHandleAutoPlay_ = function(info) {
-  this.log_('letPlayerHandleAutoPlay_: ' + info.message.autoplay);
   var autoplay = info.message.autoplay;
   info.message.autoplay = false;
   this.mediaElement_.autoplay = false;
@@ -811,6 +810,7 @@ sampleplayer.CastPlayer.prototype.loadAudio_ = function(info) {
  * @private
  */
 sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
+  console.log("gvd loadVideo_");
   var self = this;
   var protocolFunc = null;
   var url = info.message.media.contentId;
@@ -855,6 +855,58 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
   return wasPreloaded;
 };
 
+/**
+ * Load stitched ads+video stream.
+ *
+ * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
+ * @return {boolean} Whether the media was preloaded
+ * @private
+ */
+sampleplayer.CastPlayer.prototype.loadStitchedVideo_ = function(info) {
+  console.log("gvd loadStitchedVideo_");
+  var self = this;
+  var protocolFunc = null;
+  var url = info.contentId;
+  var protocolFunc = sampleplayer.getProtocolFunction_(info);
+  var wasPreloaded = false;
+
+  // gvd this.letPlayerHandleAutoPlay_(info);
+  if (!protocolFunc) {
+    this.mediaElement_.addEventListener('stalled', this.bufferingHandler_,
+        false);
+    this.mediaElement_.addEventListener('waiting', this.bufferingHandler_,
+        false);
+  } else {
+    // When MPL is used, buffering status should be detected by
+    // getState()['underflow]'
+    this.mediaElement_.removeEventListener('stalled', this.bufferingHandler_);
+    this.mediaElement_.removeEventListener('waiting', this.bufferingHandler_);
+
+    // If we have not preloaded or the content preloaded does not match the
+    // content that needs to be loaded, perform a full load
+    var loadErrorCallback = function() {
+      // unload player and trigger error event on media element
+      if (self.player_) {
+        self.resetMediaElement_();
+        self.mediaElement_.dispatchEvent(new Event('error'));
+      }
+    };
+
+    var host = new cast.player.api.Host({
+      'url': url,
+      'mediaElement': this.mediaElement_
+    });
+    var self = this;
+    host.processMetadata = function(type, data, timestamp) {
+      self.receiverStreamManager_.processMetadata(type, data, timestamp);
+    };
+    host.onError = loadErrorCallback;
+    this.player_ = new cast.player.api.Player(host);
+    this.player_.load(protocolFunc(host));
+  }
+  this.loadMediaManagerInfo_(info, !!protocolFunc);
+  return wasPreloaded;
+};
 
 /**
  * Loads media and tracks info into media manager.
