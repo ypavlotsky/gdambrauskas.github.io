@@ -684,18 +684,12 @@ sampleplayer.CastPlayer.prototype.load = function(info) {
     }
     self.playerReady_ = false;
     self.metadataLoaded_ = false;
-    self.loadMetadata_(media);
     self.showPreviewModeMetadata(false);
     self.displayPreviewMode_ = false;
     console.log("gvd nnnnnnnnnnnnnnnnot here preloaded "+preloaded)
     if (preloaded) {
-      // Data is ready to play so transiton directly to playing.
-      self.setState_(sampleplayer.State.PLAYING, false);
-      self.playerReady_ = true;
-      self.maybeSendLoadCompleted_(info);
-      // Don't display metadata again, since autoplay already did that.
-      self.deferPlay_(0);
-      self.playerAutoPlay_ = false;
+      // gvd get rid of preloaded
+
     } else {
       sampleplayer.transition_(self.element_, sampleplayer.TRANSITION_DURATION_, function() {
         self.setState_(sampleplayer.State.LOADING, false);
@@ -745,31 +739,6 @@ sampleplayer.CastPlayer.prototype.resetMediaElement_ = function() {
     this.player_ = null;
   }
   this.textTrackType_ = null;
-};
-
-
-/**
- * Loads the metadata for the given media.
- *
- * @param {!cast.receiver.media.MediaInformation} media The media.
- * @private
- */
-sampleplayer.CastPlayer.prototype.loadMetadata_ = function(media) {
-  this.log_('loadMetadata_');
-  if (!sampleplayer.isCastForAudioDevice_()) {
-    var metadata = media.metadata || {};
-    var titleElement = this.element_.querySelector('.media-title');
-    sampleplayer.setInnerText_(titleElement, metadata.title);
-
-    var subtitleElement = this.element_.querySelector('.media-subtitle');
-    sampleplayer.setInnerText_(subtitleElement, metadata.subtitle);
-
-    var artwork = sampleplayer.getMediaImageUrl_(media);
-    if (artwork) {
-      var artworkElement = this.element_.querySelector('.media-artwork');
-      sampleplayer.setBackgroundImage_(artworkElement, artwork);
-    }
-  }
 };
 
 
