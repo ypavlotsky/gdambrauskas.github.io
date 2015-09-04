@@ -1,41 +1,7 @@
-<!--
-Copyright 2014 Google Inc. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
- -->
-<!--
-This sample demonstrates how to build your own Receiver for use with Google
-Cast.
-
-A receiver is typically an HTML5 application with a html, css, and JavaScript
-components.
-
-In this HTML5 page, we include our style sheet, the Receiver SDK, and our player
-JavaScript code.
-
-We Then define two layers within the player:
-
-1. The media layers
-2. The Overlay layers
-The overlay layer holds:
-   a. Logo for startup page
-   b. Media Artwork and information during loading
-   c. controls for Pause / Seek
- -->
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Receiver Demo</title>
+  <title>simplest stream playback</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="player.css" />
   <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
@@ -89,9 +55,6 @@ The overlay layer holds:
         console.log('Receiver Manager started');
         }
 
-       // var url = 'http://cbsnews-linear.mdialog.com/video_assets/cbsnews.m3u8?api_key=563b80c1ae4ce359830f572d2496a947&stream_activity_key=4df5759395080fba6150ae2acf296467';
-      // url = 'http://truman-qa.sandbox.google.com/ssai/media/event/nSDLa3IJTLCecel2IaECyA/session/db5c544a-77bc-422f-a677-7595745a3dc8/bandwidth/1428000/media.m3u8';
-      // url = 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8'
         function playMedia(url) {
           var playerDiv = document.getElementById('player');
           var mediaElement = document.getElementById('mediaElement');
