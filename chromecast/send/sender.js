@@ -321,6 +321,7 @@ CastPlayer.prototype.loadMedia = function(mediaIndex) {
   }
 
   this.castPlayerState = PLAYER_STATE.LOADING;
+  console.log("gvd sender loading media");
   this.session.loadMedia(request,
     this.onMediaDiscovered.bind(this, 'loadMedia'),
     this.onLoadMediaError.bind(this));
