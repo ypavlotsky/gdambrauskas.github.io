@@ -272,7 +272,7 @@ sampleplayer.CastPlayer = function(element) {
       this.onVisibilityChanged_.bind(this);
   this.receiverManager_.setApplicationState(
       sampleplayer.getApplicationState_());
-
+  console.log("gvd listening to receiver manager")
 
   /**
    * The remote media object.
