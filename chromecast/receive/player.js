@@ -1342,6 +1342,7 @@ sampleplayer.CastPlayer.prototype.updateApplicationState_ = function() {
  * @private
  */
 sampleplayer.CastPlayer.prototype.onReady_ = function() {
+  console.log("gvd ready in cast player")
   this.log_('onReady');
   this.setState_(sampleplayer.State.IDLE, false);
 };
