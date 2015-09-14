@@ -543,6 +543,7 @@ sampleplayer.CastPlayer.prototype.getPlayer = function() {
  * @export
  */
 sampleplayer.CastPlayer.prototype.start = function() {
+  console.log("cast player start");
   this.receiverManager_.start();
 };
 
