@@ -41,73 +41,54 @@ The overlay layer holds:
   <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
   <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/mediaplayer/1.0.0/media_player.js"></script>
 
+  <script type="text/javascript" src="cast.js"></script>
+  <script type="text/javascript" src="player.js"></script>
 </head>
 <body style="margin: 0">
+    <div id="player" class="player">
+        <div class="media">
+            <video id='mediaElement'></video>
+        </div>
+        <div class="logo"></div>
+        <div class="spinner"></div>
+        <div class="watermark"></div>
+        <div class="gradient"></div>
+        <div class="overlay">
+            <div class="media-info">
+                <div class="media-artwork"></div>
+                <div class="media-text">
+                    <div class="media-title"></div>
+                    <div class="media-subtitle"></div>
+                </div>
+            </div>
+            <div class="preview-mode-info">
+                <div class="preview-mode-artwork"></div>
+                <div class="preview-mode-text">
+                  <div class="preview-mode-timer">
+                        <div class="preview-mode-timer-starts">Up next in&nbsp;</div>
+                        <div class="preview-mode-timer-countdown"></div>
+                        <div class="preview-mode-timer-sec">&nbsp;secs...</div>
+                    </div>
+                    <div class="preview-mode-title"></div>
+                    <div class="preview-mode-subtitle"></div>
+                </div>
+            </div>
+            <div class="controls">
+                <span class="controls-play-pause"></span>
+                <span class="controls-cur-time"></span>
+                <span class="controls-total-time"></span>
+                <div class="controls-progress">
+                    <div class="controls-progress-inner progressBar"></div>
+                    <div class="controls-progress-thumb"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <video id='mediaElement'></video>
 
     <script>
-
-      window.onload = function() {
-        cast.receiver.logger.setLevelValue(0);
-        window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
-        console.log('Starting Receiver Manager');
-
-        // handler for the 'ready' event
-        castReceiverManager.onReady = function(event) {
-          console.log('Received Ready event: ' + JSON.stringify(event.data));
-          window.castReceiverManager.setApplicationState("Application status is ready...");
-        };
-
-        // handler for 'senderconnected' event
-        castReceiverManager.onSenderConnected = function(event) {
-          console.log('Received Sender Connected event: ' + event.data);
-          console.log(window.castReceiverManager.getSender(event.data).userAgent);
-        };
-
-        // handler for 'senderdisconnected' event
-        castReceiverManager.onSenderDisconnected = function(event) {
-          console.log('Received Sender Disconnected event: ' + event.data);
-          if (window.castReceiverManager.getSenders().length == 0) {
-          window.close();
-        }
-        };
-
-        // create a CastMessageBus to handle messages for a custom namespace
-        window.messageBus =
-          window.castReceiverManager.getCastMessageBus(
-              'urn:x-cast:com.google.cast.sample.helloworld');
-        // handler for the CastMessageBus message event
-        window.messageBus.onMessage = function(event) {
-          console.log('Message [' + event.senderId + ']: ' + event.data);
-          // display the message from the sender
-          console.log('event.data ' + event.data);
-          playMedia(event.data)
-        }
-        // initialize the CastReceiverManager with an application status message
-        window.castReceiverManager.start({statusText: "Application is starting"});
-        console.log('Receiver Manager started');
-        }
-
-       // var url = 'http://cbsnews-linear.mdialog.com/video_assets/cbsnews.m3u8?api_key=563b80c1ae4ce359830f572d2496a947&stream_activity_key=4df5759395080fba6150ae2acf296467';
-      // url = 'http://truman-qa.sandbox.google.com/ssai/media/event/nSDLa3IJTLCecel2IaECyA/session/db5c544a-77bc-422f-a677-7595745a3dc8/bandwidth/1428000/media.m3u8';
-      // url = 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8'
-        function playMedia(url) {
-          var playerDiv = document.getElementById('player');
-          var mediaElement = document.getElementById('mediaElement');
-
-          console.log('using url ' + url)
-          var host = new cast.player.api.Host({
-            'url': url,
-            'mediaElement': mediaElement
-          });
-          var player = new cast.player.api.Player(host);
-          player.load(cast.player.api.CreateHlsStreamingProtocol(host));
-          player.playWhenHaveEnoughData();
-        }
-
-
-
+      var playerDiv = document.getElementById('player');
+      new sampleplayer.CastPlayer(playerDiv).start();
     </script>
 </body>
 </html>
