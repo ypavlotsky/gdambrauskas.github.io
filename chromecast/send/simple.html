@@ -46,7 +46,7 @@ input {
 </style>
 <script type="text/javascript" src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
 <script type="text/javascript">
-var applicationID = '090D48C1'; // 'BC48F4DE'; // gvd use 090D48C1, the new simple app.
+var applicationID = '090D48C1';
 var namespace = 'urn:x-cast:com.google.cast.sample.helloworld';
 var session = null;
 
@@ -75,7 +75,7 @@ function initializeCastApi() {
 function onInitSuccess() {
   console.log("onInitSuccess");
   var url = 'http://cbsnews-linear.mdialog.com/video_assets/cbsnews.m3u8?api_key=563b80c1ae4ce359830f572d2496a947&stream_activity_key=4df5759395080fba6150ae2acf296467';
-  url = 'http://truman-qa.sandbox.google.com/ssai/master/event/nSDLa3IJTLCecel2IaECyA/session/30ea52dc-03bf-45dd-aec3-91c7203206a6/master.m3u8';
+  url = 'http://truman-qa.sandbox.google.com/ssai/hls/event/nSDLa3IJTLCecel2IaECyA/session/fb8cf4e5-c52e-4de7-b3e5-adfa6680093a/master.m3u8';
   //url = 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8'
   sendMessage(url)
 }
