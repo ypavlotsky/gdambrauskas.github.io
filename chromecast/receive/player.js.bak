@@ -13,7 +13,7 @@ function gvdrequeststream(m) {
   m.requestStream(streamRequest);
 }
 
-CastPlayer = function(mediaElement) {
+Player = function(mediaElement) {
   cast.player.api.setLoggerLevel(cast.player.api.LoggerLevel.DEBUG);
   cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
   // cast.player.api.Player
@@ -161,7 +161,7 @@ example.State = {
   IDLE: 'idle'
 };
 
-example.CastPlayer.prototype.start = function() {
+example.Player.prototype.start = function() {
   this.receiverManager_.start();
 };
 
@@ -172,7 +172,7 @@ example.CastPlayer.prototype.start = function() {
  * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
  * @export
  */
-example.CastPlayer.prototype.load = function(info) {
+example.Player.prototype.load = function(info) {
   this.log_('onLoad_');
   var self = this;
   var media = info.message.media || {};
@@ -225,7 +225,7 @@ example.CastPlayer.prototype.load = function(info) {
  * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
  * @private
  */
-example.CastPlayer.prototype.maybeSendLoadCompleted_ = function(info) {
+example.Player.prototype.maybeSendLoadCompleted_ = function(info) {
   if (!this.playerReady_) {
     this.log_('Deferring load response, player not ready');
   } else if (!this.metadataLoaded_) {
@@ -241,7 +241,7 @@ example.CastPlayer.prototype.maybeSendLoadCompleted_ = function(info) {
  *
  * @private
  */
-example.CastPlayer.prototype.resetMediaElement_ = function() {
+example.Player.prototype.resetMediaElement_ = function() {
   this.log_('resetMediaElement_');
   if (this.player_) {
     this.player_.unload();
