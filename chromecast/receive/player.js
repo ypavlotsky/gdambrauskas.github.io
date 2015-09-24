@@ -170,3 +170,35 @@ example.Player.prototype.load = function(info) {
     }
   }*/
 };
+
+/**
+ * Called when we receive a EDIT_TRACKS_INFO message.
+ *
+ * @param {!cast.receiver.MediaManager.Event} event The editTracksInfo event.
+ * @private
+ */
+example.Player.prototype.onEditTracksInfo_ = function(event) {
+  this.log_('onEditTracksInfo');
+  this.onEditTracksInfoOrig_(event);
+
+  // If the captions are embedded or ttml we need to enable/disable tracks
+  // as needed (vtt is processed by the media manager)
+  if (!event.data || !event.data.activeTrackIds || !this.textTrackType_) {
+    return;
+  }
+  var mediaInformation = this.mediaManager_.getMediaInformation() || {};
+  var type = this.textTrackType_;
+  if (type == 'ttml') {
+    // The player_ may not have been created yet if the type of media did
+    // not require MPL. It will be lazily created in processTtmlCues_
+//    if (this.player_) {
+//      this.player_.enableCaptions(false, cast.player.api.CaptionsType.TTML);
+//    }
+//    this.processTtmlCues_(event.data.activeTrackIds,
+//        mediaInformation.tracks || []);
+  } else if (type == 'embedded') {
+//    this.player_.enableCaptions(false);
+//    this.processInBandTracks_(event.data.activeTrackIds);
+//    this.player_.enableCaptions(true);
+  }
+};
