@@ -6,6 +6,7 @@
 var example = example || {};
 
 example.Player = function(mediaElement) {
+  console.log('gvd player created')
   cast.player.api.setLoggerLevel(cast.player.api.LoggerLevel.DEBUG);
   cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
   // cast.player.api.Player
