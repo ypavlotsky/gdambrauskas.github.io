@@ -103,3 +103,56 @@ example.Player.prototype.onSenderDisconnected_ = function(event) {
     this.receiverManager_.stop();
   }
 };
+
+/**
+ * Loads the given data. Request comes from sender app.
+ *
+ * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
+ * @export
+ */
+example.Player.prototype.load = function(info) {
+  this.log_('onLoad_');
+  var self = this;
+  var media = info.message.media || {};
+  console.log("gvd info  "+media.customData.foo)
+  var contentType = media.contentType;
+  var playerType = example.getType_(media);
+  /*
+  var isLiveStream = media.streamType === cast.receiver.media.StreamType.LIVE;
+  if (!media.contentId) {
+    this.log_('Load failed: no content');
+  } else if (playerType === example.Type.UNKNOWN) {
+    this.log_('Load failed: unknown content type: ' + contentType);
+  } else {
+    this.log_('Loading: ' + playerType);
+    self.resetMediaElement_();
+    self.setType_(playerType, isLiveStream);
+    var preloaded = false;
+    console.log("gvd loading video yyyyyyyyyy")
+    preloaded = gvdrequeststream(this.receiverStreamManager_);// gvd self.loadVideo_(info);
+    }
+    self.playerReady_ = false;
+    self.metadataLoaded_ = false;
+    self.showPreviewModeMetadata(false);
+    self.displayPreviewMode_ = false;
+    if (preloaded) {
+      // gvd get rid of preloaded
+
+    } else {
+      example.transition_(self.element_, example.TRANSITION_DURATION_, function() {
+        self.setState_(example.State.LOADING, false);
+        // Only send load completed after we reach this point so the media
+        // manager state is still loading and the sender can't send any PLAY
+        // messages
+        self.playerReady_ = true;
+        self.maybeSendLoadCompleted_(info);
+        if (self.playerAutoPlay_) {
+          // Make sure media info is displayed long enough before playback
+          // starts.
+          self.deferPlay_(example.MEDIA_INFO_DURATION_);
+          self.playerAutoPlay_ = false;
+        }
+      });
+    }
+  }*/
+};
