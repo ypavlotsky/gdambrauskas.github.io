@@ -18,7 +18,7 @@ example.Player = function(mediaElement) {
   this.receiverManager_.onReady = this.onReady_.bind(this);
   this.receiverManager_.onSenderDisconnected =
       this.onSenderDisconnected_.bind(this);
-
+  console.log('gvd lsitening on receriver ')
   /**
    * The remote media object.
    * @private {cast.receiver.MediaManager}
@@ -27,6 +27,7 @@ example.Player = function(mediaElement) {
   this.receiverStreamManager_ =
     new google.ima.cast.ReceiverStreamManager(this.mediaElement_,
                                               this.mediaManager_);
+  console.log('gvd receiver stream manager created')
   var self = this;
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED,
