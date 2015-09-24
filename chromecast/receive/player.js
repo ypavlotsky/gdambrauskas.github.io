@@ -105,6 +105,20 @@ example.Player.prototype.onSenderDisconnected_ = function(event) {
 };
 
 /**
+ * Called when we receive a LOAD message. Calls load().
+ *
+ * @see sampleplayer#load
+ * @param {cast.receiver.MediaManager.Event} event The load event.
+ * @private
+ */
+example.CastPlayer.prototype.onLoad_ = function(event) {
+  this.log_('onLoad_');
+  this.load(new cast.receiver.MediaManager.LoadInfo( // gvd check out how this is used!
+      /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data),
+      event.senderId));
+};
+
+/**
  * Loads the given data. Request comes from sender app.
  *
  * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
