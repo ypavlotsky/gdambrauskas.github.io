@@ -83,7 +83,7 @@ example.Player = function(mediaElement) {
  *
  * @private
  */
-Player.prototype.onReady_ = function() {
+example.Player.prototype.onReady_ = function() {
   this.log_('onReady');
 };
 
@@ -93,7 +93,7 @@ Player.prototype.onReady_ = function() {
  * @param {cast.receiver.CastReceiverManager.SenderDisconnectedEvent} event
  * @private
  */
-Player.prototype.onSenderDisconnected_ = function(event) {
+example.Player.prototype.onSenderDisconnected_ = function(event) {
   this.log_('onSenderDisconnected');
   // When the last or only sender is connected to a receiver,
   // tapping Disconnect stops the app running on the receiver.
