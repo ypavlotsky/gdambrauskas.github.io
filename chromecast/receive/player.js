@@ -1,6 +1,11 @@
 'use strict';
 
-Player = function(mediaElement) {
+/**
+ * Creates the namespace
+ */
+var example = example || {};
+
+example.Player = function(mediaElement) {
   cast.player.api.setLoggerLevel(cast.player.api.LoggerLevel.DEBUG);
   cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
   // cast.player.api.Player
