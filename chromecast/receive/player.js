@@ -84,7 +84,7 @@ example.Player = function(mediaElement) {
  * @private
  */
 example.Player.prototype.onReady_ = function() {
-  this.log_('onReady');
+  console.log('onReady');
 };
 
 /**
@@ -94,7 +94,7 @@ example.Player.prototype.onReady_ = function() {
  * @private
  */
 example.Player.prototype.onSenderDisconnected_ = function(event) {
-  this.log_('onSenderDisconnected');
+  console.log('onSenderDisconnected');
   // When the last or only sender is connected to a receiver,
   // tapping Disconnect stops the app running on the receiver.
   if (this.receiverManager_.getSenders().length === 0 &&
@@ -112,7 +112,7 @@ example.Player.prototype.onSenderDisconnected_ = function(event) {
  * @private
  */
 example.Player.prototype.onLoad_ = function(event) {
-  this.log_('onLoad_');
+  console.log('onLoad_');
   this.load(new cast.receiver.MediaManager.LoadInfo( // gvd check out how this is used!
       /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data),
       event.senderId));
@@ -125,7 +125,7 @@ example.Player.prototype.onLoad_ = function(event) {
  * @export
  */
 example.Player.prototype.load = function(info) {
-  this.log_('onLoad_');
+  console.log('onLoad_');
   var self = this;
   var media = info.message.media || {};
   console.log("gvd info  "+media.customData.foo)
@@ -134,11 +134,11 @@ example.Player.prototype.load = function(info) {
   /*
   var isLiveStream = media.streamType === cast.receiver.media.StreamType.LIVE;
   if (!media.contentId) {
-    this.log_('Load failed: no content');
+    console.log('Load failed: no content');
   } else if (playerType === example.Type.UNKNOWN) {
-    this.log_('Load failed: unknown content type: ' + contentType);
+    console.log('Load failed: unknown content type: ' + contentType);
   } else {
-    this.log_('Loading: ' + playerType);
+    console.log('Loading: ' + playerType);
     self.resetMediaElement_();
     self.setType_(playerType, isLiveStream);
     var preloaded = false;
@@ -178,7 +178,7 @@ example.Player.prototype.load = function(info) {
  * @private
  */
 example.Player.prototype.onEditTracksInfo_ = function(event) {
-  this.log_('onEditTracksInfo');
+  console.log('onEditTracksInfo');
   this.onEditTracksInfoOrig_(event);
 
   // If the captions are embedded or ttml we need to enable/disable tracks
