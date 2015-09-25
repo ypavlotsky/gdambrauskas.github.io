@@ -203,7 +203,7 @@ function gvdrequeststream(m) {
  * @return {boolean} Whether the media was preloaded
  * @private
  */
-example.CastPlayer.prototype.loadStitchedVideo_ = function(info) {
+example.Player.prototype.loadStitchedVideo_ = function(info) {
   console.log("gvd loadStitchedVideo_");
   var self = this;
   var url = info.contentId;
