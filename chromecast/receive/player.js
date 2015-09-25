@@ -76,7 +76,7 @@ example.Player = function(mediaElement) {
   this.onEditTracksInfoOrig_ =
       this.mediaManager_.onEditTracksInfo.bind(this.mediaManager_);
   this.mediaManager_.onEditTracksInfo = this.onEditTracksInfo_.bind(this);
-
+  console.log('gvd receiver stream manager end of constructor')
 };
 
 /**
