@@ -82,6 +82,12 @@ example.Player = function(mediaElement) {
   console.log('gvd receiver stream manager end of constructor')
 };
 
+
+example.Player.prototype.start = function() {
+  this.receiverManager_.start();
+  console.log('gvd started receiver manager')
+};
+
 /**
  * Called when the player is ready. We initialize the UI for the launching
  * and idle screens.
