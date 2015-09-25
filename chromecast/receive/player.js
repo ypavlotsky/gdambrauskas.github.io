@@ -16,7 +16,7 @@ example.Player = function(mediaElement) {
   // cast.receiver.CastReceiverManager
   this.receiverManager_ = cast.receiver.CastReceiverManager.getInstance();
   this.receiverManager_.onReady = this.onReady_.bind(this);
-  castReceiverManager.onSenderConnected = function(event) {
+  this.receiverManager_.onSenderConnected = function(event) {
     console.log('Received Sender Connected event: ' + event.data);
   };
   this.receiverManager_.onSenderDisconnected =
