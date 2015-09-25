@@ -141,7 +141,7 @@ example.Player.prototype.load = function(info) {
   var media = info.message.media || {};
   console.log("gvd info  "+media.customData.foo)
   var contentType = media.contentType;
-  var playerType = example.getType_(media);
+  console.log("gvd info  contentType "+contentType);
   /*
   var isLiveStream = media.streamType === cast.receiver.media.StreamType.LIVE;
   if (!media.contentId) {
