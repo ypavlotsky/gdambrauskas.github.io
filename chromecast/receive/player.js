@@ -142,6 +142,7 @@ example.Player.prototype.load = function(info) {
   console.log("gvd info  "+media.customData.foo)
   var contentType = media.contentType;
   console.log("gvd info  contentType "+contentType);
+  gvdrequeststream(this.receiverStreamManager_)
   /*
   var isLiveStream = media.streamType === cast.receiver.media.StreamType.LIVE;
   if (!media.contentId) {
@@ -180,6 +181,51 @@ example.Player.prototype.load = function(info) {
       });
     }
   }*/
+};
+
+function gvdrequeststream(m) {
+  var streamRequest = new google.ima.cast.StreamRequest();
+  streamRequest.apiKey = 'testApiKey';
+  streamRequest.assetKey = 'nSDLa3IJTLCecel2IaECyA';
+  streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
+  streamRequest.attemptPreroll = true;
+  streamRequest.customParameters = 'bar=0&foo=1';
+  //this.receiverStreamManager_.addEventListener(type, func, false)
+  console.log('gvd 0000 streamRequest.apiKey '+streamRequest.apiKey)
+  console.log(streamRequest)
+  m.requestStream(streamRequest);
+}
+
+/**
+ * Load stitched ads+video stream.
+ *
+ * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
+ * @return {boolean} Whether the media was preloaded
+ * @private
+ */
+example.CastPlayer.prototype.loadStitchedVideo_ = function(info) {
+  console.log("gvd loadStitchedVideo_");
+  var self = this;
+  var url = info.contentId;
+    // When MPL is used, buffering status should be detected by
+    // getState()['underflow]'
+    this.mediaElement_.removeEventListener('stalled', this.bufferingHandler_);
+    this.mediaElement_.removeEventListener('waiting', this.bufferingHandler_);
+
+    var host = new cast.player.api.Host({
+      //'url': 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8', // gvd url,
+      'url': url,
+      'mediaElement': this.mediaElement_
+    });
+    var self = this;
+    host.processMetadata = function(type, data, timestamp) {
+      console.log("gvd metadata firing "+type + " "+data)
+      self.receiverStreamManager_.processMetadata(type, data, timestamp);
+    };
+    // gvd host.onError = loadErrorCallback;
+    this.player_ = new cast.player.api.Player(host);
+    this.player_.load(cast.player.api.CreateHlsStreamingProtocol(host));
+  // gvd this.loadMediaManagerInfo_(info, !!protocolFunc);
 };
 
 /**
