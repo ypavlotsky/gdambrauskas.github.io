@@ -56,8 +56,8 @@ example.Player = function(mediaElement) {
       },
       false);
   var streamRequest = new google.ima.cast.StreamRequest();
-  streamRequest.apiKey = 'apiKey';
-  streamRequest.assetKey = 'nSDLa3IJTLCecel2IaECyA';
+  streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
+  streamRequest.assetKey = 'F-Aj4thaSC6yxrLIVITt1A';
   streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
   streamRequest.attemptPreroll = false;
   streamRequest.customParameters = 'bar=0&foo=1';
@@ -185,8 +185,8 @@ example.Player.prototype.load = function(info) {
 
 function gvdrequeststream(m) {
   var streamRequest = new google.ima.cast.StreamRequest();
-  streamRequest.apiKey = 'testApiKey';
-  streamRequest.assetKey = 'nSDLa3IJTLCecel2IaECyA';
+  streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
+  streamRequest.assetKey = 'F-Aj4thaSC6yxrLIVITt1A';
   streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
   streamRequest.attemptPreroll = true;
   streamRequest.customParameters = 'bar=0&foo=1';
