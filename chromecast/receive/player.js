@@ -33,7 +33,7 @@ example.Player = function(mediaElement) {
   console.log('gvd receiver stream manager created')
   var self = this;
   this.receiverStreamManager_.addEventListener(
-      google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED,
+      google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
         console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED ")
         console.log(event.type)
