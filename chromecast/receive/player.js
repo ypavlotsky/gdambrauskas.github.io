@@ -40,7 +40,7 @@ example.Player = function(mediaElement) {
         try {
         console.log("gvd eventdata" + event.getData());
         }catch(e){
-          console.log("gvd errrrrrrrrrrrr");
+          console.log("gvd errrrrrrrrrrrr "+e);
         }
         console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.LOADED 2")
         var streamUrl = event.getData().streamUrl;
