@@ -190,7 +190,7 @@ function gvdrequeststream(m) {
   streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
   streamRequest.attemptPreroll = true;
   streamRequest.customParameters = 'bar=0&foo=1';
-  console.log('gvd 0000 streamRequest.apiKey '+streamRequest.apiKey)
+  console.log('gvd 0000 streamRequest.apiKey ['+streamRequest.apiKey+']')
   console.log(streamRequest)
   m.requestStream(streamRequest);
 }
