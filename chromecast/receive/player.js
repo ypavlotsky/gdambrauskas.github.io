@@ -35,7 +35,7 @@ example.Player = function(mediaElement) {
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
-        console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.STREAM_INITIALIZED ")
+        console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.LOADED ")
         console.log(event.type)
         console.log(event.getData())
         var streamUrl = event.getData().streamUrl;
