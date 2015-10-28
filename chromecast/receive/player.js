@@ -218,8 +218,8 @@ example.Player.prototype.loadStitchedVideo_ = function(info) {
     this.mediaElement_.removeEventListener('waiting', this.bufferingHandler_);
 
     var host = new cast.player.api.Host({
-      'url': 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8', // gvd url,
-      //'url': url,
+      //'url': 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8', // gvd url,
+      'url': url,
       'mediaElement': this.mediaElement_
     });
     var self = this;
