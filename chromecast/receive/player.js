@@ -212,25 +212,21 @@ example.Player.prototype.loadStitchedVideo_ = function(info) {
   console.log("gvd loadStitchedVideo_");
   var self = this;
   var url = info.contentId;
-    // When MPL is used, buffering status should be detected by
-    // getState()['underflow]'
-    this.mediaElement_.removeEventListener('stalled', this.bufferingHandler_);
-    this.mediaElement_.removeEventListener('waiting', this.bufferingHandler_);
-
-    var host = new cast.player.api.Host({
-      //'url': 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8', // gvd url,
-      'url': url,
-      'mediaElement': this.mediaElement_
-    });
-    var self = this;
-    host.processMetadata = function(type, data, timestamp) {
-      console.log("gvd metadata firing "+type + " "+data)
-      self.receiverStreamManager_.processMetadata(type, data, timestamp);
-    };
-    // gvd host.onError = loadErrorCallback;
-    this.player_ = new cast.player.api.Player(host);
-    this.player_.load(cast.player.api.CreateHlsStreamingProtocol(host));
-    console.log("gvd should be playing canned")
+  var host = new cast.player.api.Host({
+    //'url': 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8', // gvd url,
+    'url': url,
+    'mediaElement': this.mediaElement_
+  });
+  var self = this;
+  host.processMetadata = function(type, data, timestamp) {
+    console.log("gvd metadata firing "+type + " "+data)
+    console.log("gvd string from data "+String.fromCharCode.apply(null, data))
+    self.receiverStreamManager_.processMetadata(type, data, timestamp);
+  };
+  // gvd host.onError = loadErrorCallback;
+  this.player_ = new cast.player.api.Player(host);
+  this.player_.load(cast.player.api.CreateHlsStreamingProtocol(host));
+  console.log("gvd should be playing canned")
   // gvd this.loadMediaManagerInfo_(info, !!protocolFunc);
 };
 
