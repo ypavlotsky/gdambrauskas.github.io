@@ -230,7 +230,7 @@ example.Player.prototype.loadStitchedVideo_ = function(info) {
     // gvd host.onError = loadErrorCallback;
     this.player_ = new cast.player.api.Player(host);
     this.player_.load(cast.player.api.CreateHlsStreamingProtocol(host));
-    console.log("gvd should be playing")
+    console.log("gvd should be playing canned")
   // gvd this.loadMediaManagerInfo_(info, !!protocolFunc);
 };
 
