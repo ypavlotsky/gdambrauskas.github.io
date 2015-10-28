@@ -42,7 +42,8 @@ example.Player = function(mediaElement) {
         }catch(e){
           console.log("gvd errrrrrrrrrrrr "+e);
         }
-        console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.LOADED 2")
+        console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.LOADED 2 event.getData() "+JSON.stringify(event.getData()));
+
         var streamUrl = event.getData().streamUrl;
         var subtitles = event.getData().subtitles;
         console.log("gvd lading video with streamUrl0 "+streamUrl)
