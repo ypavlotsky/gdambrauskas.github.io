@@ -2,15 +2,23 @@
 <html manifest="nocache.mf">
 <head>
   <title>Receiver Demo</title>
+  <style type="text/css">
+    .outer-container {
+      position: relative;
+      height: 0;
+      padding-bottom: 56.25%;
+    }
+  </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
   <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/mediaplayer/1.0.0/media_player.js"></script>
   <script type="text/javascript" src="player.js"></script>
-
   <script type="text/javascript" src="cast.js"></script>
 </head>
 <body>
+  <div id="container1" class="outer-container">
     <video id='mediaElement' autoplay='true'></video>
+  </div>
     <script>
       var player = new example.Player(document.getElementById('mediaElement'));
       player.start();
