@@ -44,7 +44,7 @@ example.Player = function(mediaElement) {
         }
         console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.LOADED 2 event.getData() "+JSON.stringify(event.getData()));
 
-        var streamUrl = event.getData().streamUrl;
+        var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
         var subtitles = event.getData().subtitles;
         console.log("gvd lading video with streamUrl0 "+streamUrl)
         var mediaInfo = {};
