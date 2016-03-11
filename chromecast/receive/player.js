@@ -1,14 +1,11 @@
 'use strict';
 
-console.log('gvd player file loaded')
-
 /**
  * Creates the namespace
  */
 var example = example || {};
 
 example.Player = function(mediaElement) {
-  console.log('gvd player created')
   cast.player.api.setLoggerLevel(cast.player.api.LoggerLevel.DEBUG);
   cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
   // cast.player.api.Player
@@ -23,38 +20,30 @@ example.Player = function(mediaElement) {
   };
   this.receiverManager_.onSenderDisconnected =
       this.onSenderDisconnected_.bind(this);
-  console.log('gvd lsitening on receriver ')
-  /**
-   * The remote media object.
-   * @private {cast.receiver.MediaManager}
-   */
+
+  // cast.receiver.MediaManager
   this.mediaManager_ = new cast.receiver.MediaManager(this.mediaElement_);
+  // google.ima.cast.ReceiverStreamManager
   this.receiverStreamManager_ =
     new google.ima.cast.ReceiverStreamManager(this.mediaElement_,
                                               this.mediaManager_);
-  console.log('gvd receiver stream manager created')
   var self = this;
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
-        console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.LOADED ")
-        console.log("gvd ebentype "+ event.type);
         try {
-        console.log("gvd eventdata" + event.getData());
+          console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.LOADED 2 event.getData() "+JSON.stringify(event.getData()));
         }catch(e){
           console.log("gvd errrrrrrrrrrrr "+e);
         }
-        console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.LOADED 2 event.getData() "+JSON.stringify(event.getData()));
-
         var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
         var subtitles = event.getData().subtitles;
-        console.log("gvd lading video with streamUrl0 "+streamUrl)
+        console.log("gvd lading video with streamUrl0 "+streamUrl + " subtitle "+subtitles)
         var mediaInfo = {};
         mediaInfo.contentId = streamUrl;
         // gvd mediaInfo.metadata = {};
         // mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
         mediaInfo.contentType = 'application/x-mpegurl';
-        console.log("gvd lading video with streamUrl1 "+streamUrl)
         self.loadStitchedVideo_(mediaInfo);
         /*
          Object
