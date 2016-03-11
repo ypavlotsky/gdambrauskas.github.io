@@ -148,7 +148,7 @@ example.Player.prototype.onLoad_ = function(event) {
  * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
  * @export
  */
-example.Player.prototype.load = function(info) {
+example.Player.prototype.loadgvd = function(info) {
   console.log('onLoad_');
   var self = this;
   var media = info.message.media || {};
@@ -196,6 +196,7 @@ example.Player.prototype.load = function(info) {
   }*/
 };
 
+/*
 function gvdrequeststream(m) {
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
@@ -207,6 +208,7 @@ function gvdrequeststream(m) {
   console.log(streamRequest)
   m.requestStream(streamRequest);
 }
+*/
 
 /**
  * Load stitched ads+video stream.
