@@ -44,7 +44,7 @@ example.Player = function(mediaElement) {
         // gvd mediaInfo.metadata = {};
         // mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
         mediaInfo.contentType = 'application/x-mpegurl';
-        self.loadStitchedVideo_(mediaInfo);
+        self.loadStitchedVideo_(streamUrl);
         /*
          Object
          streamUrl: "http://truman-qa.sandbox.google.com/ssai/master/event/nSDLa3IJTLCecel2IaECyA/session/05222fd5-aed3-4652-ab43-74077295a810/master.m3u8"subtitles: Array[0]
@@ -54,10 +54,10 @@ example.Player = function(mediaElement) {
       false);
   var streamRequest = new google.ima.cast.StreamRequest();
   // optional api key
-  // streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
+   streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
   // asset key is required for live streams.
   streamRequest.assetKey = 'F-Aj4thaSC6yxrLIVITt1A';
-  streamRequest.assetKey = 'sN_IYUG8STe1ZzhIIE_ksA';
+  // gvd rus stream streamRequest.assetKey = 'sN_IYUG8STe1ZzhIIE_ksA';
   streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
   streamRequest.attemptPreroll = false;
   streamRequest.customParameters = 'bar=0&foo=1';
@@ -215,12 +215,10 @@ function gvdrequeststream(m) {
  * @return {boolean} Whether the media was preloaded
  * @private
  */
-example.Player.prototype.loadStitchedVideo_ = function(info) {
+example.Player.prototype.loadStitchedVideo_ = function(url) {
   console.log("gvd loadStitchedVideo_");
   var self = this;
-  var url = info.contentId;
   var host = new cast.player.api.Host({
-    //'url': 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8', // gvd url,
     'url': url,
     'mediaElement': this.mediaElement_
   });
