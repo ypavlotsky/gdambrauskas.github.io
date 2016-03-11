@@ -62,8 +62,11 @@ example.Player = function(mediaElement) {
       },
       false);
   var streamRequest = new google.ima.cast.StreamRequest();
-  streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
+  // optional api key
+  // streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
+  // asset key is required for live streams.
   streamRequest.assetKey = 'F-Aj4thaSC6yxrLIVITt1A';
+  streamRequest.assetKey = 'sN_IYUG8STe1ZzhIIE_ksA';
   streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
   streamRequest.attemptPreroll = false;
   streamRequest.customParameters = 'bar=0&foo=1';
@@ -102,6 +105,19 @@ example.Player.prototype.start = function() {
  */
 example.Player.prototype.onReady_ = function() {
   console.log('onReady');
+  // gvd
+  var streamRequest = new google.ima.cast.StreamRequest();
+  // optional api key
+  // streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
+  // asset key is required for live streams.
+  streamRequest.assetKey = 'F-Aj4thaSC6yxrLIVITt1A';
+  streamRequest.assetKey = 'sN_IYUG8STe1ZzhIIE_ksA';
+  streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
+  streamRequest.attemptPreroll = false;
+  streamRequest.customParameters = 'bar=0&foo=1';
+  //this.receiverStreamManager_.addEventListener(type, func, false)
+  console.log('gvd about to make request')
+  this.receiverStreamManager_.requestStream(streamRequest);
 };
 
 /**

@@ -33,7 +33,6 @@ Sender.prototype.initializeSender = function() {
   chrome.cast.initialize(apiConfig,
                          this.onInitSuccess.bind(this),
                          this.onError.bind(this));
-  this.initializeUI();
 };
 
 /**
@@ -41,6 +40,7 @@ Sender.prototype.initializeSender = function() {
  */
 Sender.prototype.onInitSuccess = function() {
   console.log('init success');
+  this.launchApp();
 };
 
 /**
@@ -54,11 +54,18 @@ Sender.prototype.onError = function() {
  * @param {!Object} e A new session
  */
 Sender.prototype.sessionListener = function(e) {
+  console.log('gvd session listener')
   if (!this.session) {
     this.session = e;
     this.session.addUpdateListener(this.sessionUpdateListener.bind(this));
-    this.loadMedia();
   }
+}
+
+
+Sender.prototype.onRequestSessionSuccess = function(e) {
+  console.log("Successfully created session: " + e.sessionId);
+  this.session = e;
+  this.loadMedia();
 }
 
 
@@ -97,7 +104,7 @@ Sender.prototype.sessionUpdateListener = function(isAlive) {
 Sender.prototype.launchApp = function() {
   console.log('launching app...');
   chrome.cast.requestSession(
-    this.sessionListener.bind(this),
+    this.onRequestSessionSuccess.bind(this),
     this.onLaunchError.bind(this));
   if( this.timer ) {
     clearInterval(this.timer);
