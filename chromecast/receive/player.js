@@ -102,7 +102,7 @@ example.Player.prototype.onReady_ = function() {
   // streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
   // asset key is required for live streams.
   // streamRequest.assetKey = 'F-Aj4thaSC6yxrLIVITt1A';
-  stream streamRequest.assetKey = 'sN_IYUG8STe1ZzhIIE_ksA';  // gvd rus
+  streamRequest.assetKey = 'sN_IYUG8STe1ZzhIIE_ksA';  // gvd rus stream
   streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
   streamRequest.attemptPreroll = false;
   streamRequest.customParameters = 'bar=0&foo=1';
