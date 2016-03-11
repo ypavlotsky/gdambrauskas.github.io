@@ -227,7 +227,7 @@ example.Player.prototype.loadStitchedVideo_ = function(url) {
   host.processMetadata = function(type, data, timestamp) {
     console.log("gvd metadata firing "+type + " "+data)
     console.log("gvd string from data "+String.fromCharCode.apply(null, data))
-    // gvd for now don't process metadata, just to be sure it doesn't cause problems self.receiverStreamManager_.processMetadata(type, data, timestamp);
+    self.receiverStreamManager_.processMetadata(type, data, timestamp);
   };
   // gvd host.onError = loadErrorCallback;
   this.player_ = new cast.player.api.Player(host);
