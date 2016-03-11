@@ -1,5 +1,7 @@
 'use strict';
 
+console.log('gvd player file loaded')
+
 /**
  * Creates the namespace
  */
