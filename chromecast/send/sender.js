@@ -130,8 +130,6 @@ Sender.prototype.loadMedia = function() {
   }
   // extract media stuff here gvd
   var assetKey = 'nSDLa3IJTLCecel2IaECyA';
-  // gvd
-  assetKey = 'http://gvabox.com/html5/sanils/ssai/mock_live/playlist.m3u8';
   var mediaInfo = new chrome.cast.media.MediaInfo(assetKey);
   mediaInfo.customData = {foo:1};
 
