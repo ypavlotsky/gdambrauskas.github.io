@@ -31,25 +31,22 @@ example.Player = function(mediaElement) {
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
-        try {
-          console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.LOADED 2 event.getData() "+JSON.stringify(event.getData()));
-        }catch(e){
-          console.log("gvd errrrrrrrrrrrr "+e);
-        }
-        var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
+        // gvd check fields in this, better to expose as public api etc
+        var streamUrl = event.getData().url;
         var subtitles = event.getData().subtitles;
-        console.log("gvd lading video with streamUrl0 "+streamUrl + " subtitle "+subtitles)
         var mediaInfo = {};
         mediaInfo.contentId = streamUrl;
-        // gvd mediaInfo.metadata = {};
-        // mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
         mediaInfo.contentType = 'application/x-mpegurl';
-        self.loadStitchedVideo_(streamUrl);
-        /*
-         Object
-         streamUrl: "http://truman-qa.sandbox.google.com/ssai/master/event/nSDLa3IJTLCecel2IaECyA/session/05222fd5-aed3-4652-ab43-74077295a810/master.m3u8"subtitles: Array[0]
-         */
-        // gvd self.onReceiverStreamManagerEvent_(),
+        var host = new cast.player.api.Host({
+          'url': url,
+          'mediaElement': this.mediaElement_
+        });
+        var self = this;
+        host.processMetadata = function(type, data, timestamp) {
+          self.receiverStreamManager_.processMetadata(type, data, timestamp);
+        };
+        this.player_ = new cast.player.api.Player(host);
+        this.player_.load(cast.player.api.CreateHlsStreamingProtocol(host));
       },
       false);
   var streamRequest = new google.ima.cast.StreamRequest();
@@ -79,7 +76,6 @@ example.Player = function(mediaElement) {
   this.onEditTracksInfoOrig_ =
       this.mediaManager_.onEditTracksInfo.bind(this.mediaManager_);
   this.mediaManager_.onEditTracksInfo = this.onEditTracksInfo_.bind(this);
-  console.log('gvd receiver stream manager end of constructor')
 };
 
 
@@ -209,31 +205,6 @@ function gvdrequeststream(m) {
   m.requestStream(streamRequest);
 }
 
-/**
- * Load stitched ads+video stream.
- *
- * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
- * @return {boolean} Whether the media was preloaded
- * @private
- */
-example.Player.prototype.loadStitchedVideo_ = function(url) {
-  console.log("gvd loadStitchedVideo_");
-  var self = this;
-  var host = new cast.player.api.Host({
-    'url': url,
-    'mediaElement': this.mediaElement_
-  });
-  var self = this;
-  host.processMetadata = function(type, data, timestamp) {
-    console.log("gvd metadata firing "+type + " "+data)
-    console.log("gvd string from data "+String.fromCharCode.apply(null, data))
-    self.receiverStreamManager_.processMetadata(type, data, timestamp);
-  };
-  // gvd host.onError = loadErrorCallback;
-  this.player_ = new cast.player.api.Player(host);
-  this.player_.load(cast.player.api.CreateHlsStreamingProtocol(host));
-  // gvd this.loadMediaManagerInfo_(info, !!protocolFunc);
-};
 
 /**
  * Called when we receive a EDIT_TRACKS_INFO message.
