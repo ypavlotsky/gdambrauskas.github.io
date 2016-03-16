@@ -147,6 +147,7 @@ Sender.prototype.loadMedia = function() {
   var request = new chrome.cast.media.LoadRequest(mediaInfo);
   request.autoplay = this.autoplay;
   request.currentTime = 0;
+  console.log("gvd session loading media");
   this.session.loadMedia(request,
                          this.onMediaDiscovered.bind(this, 'loadMedia'),
                          this.onLoadMediaError.bind(this));
@@ -157,8 +158,6 @@ Sender.prototype.loadMedia = function() {
  * @param {Object} mediaSession A new media object.
  */
 Sender.prototype.onMediaDiscovered = function(how, mediaSession) {
-  console.log('media discovered');
-  console.log('gvd '+how);
   this.currentMediaSession = mediaSession;
 };
 

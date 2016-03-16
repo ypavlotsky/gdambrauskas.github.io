@@ -31,11 +31,6 @@ example.Player = function(mediaElement) {
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
-        try {
-          console.log("gvd RECEIVED google.ima.cast.StreamEvent.Type.LOADED 2 event.getData() "+JSON.stringify(event.getData()));
-        }catch(e){
-          console.log("gvd errrrrrrrrrrrr "+e);
-        }
         var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
         var subtitles = event.getData().subtitles;
         console.log("gvd lading video with streamUrl0 "+streamUrl + " subtitle "+subtitles)
@@ -140,10 +135,10 @@ example.Player.prototype.load = function(info) {
   var contentType = media.contentType;
   */
   var streamRequest = new google.ima.cast.StreamRequest();
-  streamRequest.assetKey = media.customData.assetKey;
-  streamRequest.assetType = media.customData.assetType;
-  streamRequest.attemptPreroll = media.customData.attemptPreroll;
-  streamRequest.adTagParameters = media.customData.adTagParameters;
+  streamRequest.assetKey = info.customData.assetKey;
+  streamRequest.assetType = info.customData.assetType;
+  streamRequest.attemptPreroll = info.customData.attemptPreroll;
+  streamRequest.adTagParameters = info.customData.adTagParameters;
   //this.receiverStreamManager_.addEventListener(type, func, false)
   console.log('gvd about to make request')
   this.receiverStreamManager_.requestStream(streamRequest);
