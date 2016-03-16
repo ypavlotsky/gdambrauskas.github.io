@@ -129,16 +129,13 @@ example.Player.prototype.onLoad_ = function(event) {
  */
 example.Player.prototype.load = function(info) {
   console.log('gvd xxxxxxxxxxxxxx onLoad_');
-  /*
-  var self = this;
   var media = info.message.media || {};
   var contentType = media.contentType;
-  */
   var streamRequest = new google.ima.cast.StreamRequest();
-  streamRequest.assetKey = info.customData.assetKey;
-  streamRequest.assetType = info.customData.assetType;
-  streamRequest.attemptPreroll = info.customData.attemptPreroll;
-  streamRequest.adTagParameters = info.customData.adTagParameters;
+  streamRequest.assetKey = media.customData.assetKey;
+  streamRequest.assetType = media.customData.assetType;
+  streamRequest.attemptPreroll = media.customData.attemptPreroll;
+  streamRequest.adTagParameters = media.customData.adTagParameters;
   //this.receiverStreamManager_.addEventListener(type, func, false)
   console.log('gvd about to make request')
   this.receiverStreamManager_.requestStream(streamRequest);
