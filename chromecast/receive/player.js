@@ -178,13 +178,12 @@ example.Player.prototype.loadStitchedVideo_ = function(url) {
     'mediaElement': this.mediaElement_
   });
   var self = this;
+  /* gvd
   host.processMetadata = function(type, data, timestamp) {
-    // gvd
-    if (true)
-    return;
     console.log("gvd entry for metadata "+String.fromCharCode.apply(null, data))
     self.receiverStreamManager_.processMetadata(type, data, timestamp);
   };
+  */
   // gvd host.onError = loadErrorCallback;
   this.player_ = new cast.player.api.Player(host);
   this.player_.load(cast.player.api.CreateHlsStreamingProtocol(host));
