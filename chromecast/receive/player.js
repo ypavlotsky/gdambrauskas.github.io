@@ -179,13 +179,7 @@ example.Player.prototype.loadStitchedVideo_ = function(url) {
   });
   var self = this;
   host.processMetadata = function(type, data, timestamp) {
-
-    for (var i = 0; i < data.length; i++) {
-      console.log("gvd char "+String.fromCharCode(data[i]))
-    }
-
-    console.log("gvd metadata firing "+type + " "+data + " count:"+data.length)
-    console.log("gvd string from data "+String.fromCharCode.apply(null, data))
+    console.log("gvd entry for metadata "+String.fromCharCode.apply(null, data))
     self.receiverStreamManager_.processMetadata(type, data, timestamp);
   };
   // gvd host.onError = loadErrorCallback;
