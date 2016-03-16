@@ -45,17 +45,6 @@ example.Player = function(mediaElement) {
         self.loadStitchedVideo_(streamUrl);
       },
       false);
-  var streamRequest = new google.ima.cast.StreamRequest();
-  // optional api key
-   streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
-  // asset key is required for live streams.
-  streamRequest.assetKey = 'F-Aj4thaSC6yxrLIVITt1A';
-  // gvd rus stream streamRequest.assetKey = 'sN_IYUG8STe1ZzhIIE_ksA';
-  streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
-  streamRequest.attemptPreroll = false;
-  streamRequest.customParameters = 'bar=0&foo=1';
-  //this.receiverStreamManager_.addEventListener(type, func, false)
-  //this.receiverStreamManager_.requestStream(streamRequest);
 
   /**
    * The original load callback.
@@ -89,6 +78,7 @@ example.Player.prototype.start = function() {
  */
 example.Player.prototype.onReady_ = function() {
   console.log('onReady');
+  /*
   // gvd
   var streamRequest = new google.ima.cast.StreamRequest();
   // optional api key
@@ -98,10 +88,11 @@ example.Player.prototype.onReady_ = function() {
   streamRequest.assetKey = 'sN_IYUG8STe1ZzhIIE_ksA';  // gvd rus stream
   streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
   streamRequest.attemptPreroll = false;
-  streamRequest.customParameters = 'bar=0&foo=1';
+  streamRequest.adTagParameters = 'bar=0&foo=1';
   //this.receiverStreamManager_.addEventListener(type, func, false)
   console.log('gvd about to make request')
   this.receiverStreamManager_.requestStream(streamRequest);
+  */
 };
 
 /**
@@ -142,12 +133,20 @@ example.Player.prototype.onLoad_ = function(event) {
  * @export
  */
 example.Player.prototype.load = function(info) {
-  console.log('onLoad_');
+  console.log('gvd xxxxxxxxxxxxxx onLoad_');
+  /*
   var self = this;
   var media = info.message.media || {};
-  console.log("gvd info  "+media.customData.foo)
   var contentType = media.contentType;
-  console.log("gvd info  contentType "+contentType);
+  */
+  var streamRequest = new google.ima.cast.StreamRequest();
+  streamRequest.assetKey = media.customData.assetKey;
+  streamRequest.assetType = media.customData.assetType;
+  streamRequest.attemptPreroll = media.customData.attemptPreroll;
+  streamRequest.adTagParameters = media.customData.adTagParameters;
+  //this.receiverStreamManager_.addEventListener(type, func, false)
+  console.log('gvd about to make request')
+  this.receiverStreamManager_.requestStream(streamRequest);
 };
 
 

@@ -123,25 +123,30 @@ Sender.prototype.onLaunchError = function() {
  * @param {Number} mediaIndex An index number to indicate current media content
  */
 Sender.prototype.loadMedia = function() {
-  console.log("gvd load media in sender");
   if (!this.session) {
     console.log('no session');
     return;
   }
-  // extract media stuff here gvd
-  var assetKey = 'nSDLa3IJTLCecel2IaECyA';
-  var mediaInfo = new chrome.cast.media.MediaInfo(assetKey);
-  mediaInfo.customData = {foo:1};
+
+  var streamRequest = {};
+  // optional api key
+  // streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
+  // asset key is required for live streams.
+  // streamRequest.assetKey = 'F-Aj4thaSC6yxrLIVITt1A';
+  streamRequest.assetKey = 'sN_IYUG8STe1ZzhIIE_ksA';
+  streamRequest.assetType = 'event';
+  streamRequest.attemptPreroll = false;
+  streamRequest.adTagParameters = 'bar=0&foo=1';
+  var mediaInfo = new chrome.cast.media.MediaInfo(streamRequest.assetKey);
+  mediaInfo.customData = streamRequest;
 
   mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
   mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
   mediaInfo.contentType = 'application/x-mpegurl';
 
-
   var request = new chrome.cast.media.LoadRequest(mediaInfo);
   request.autoplay = this.autoplay;
   request.currentTime = 0;
-  console.log("gvd sender loading media");
   this.session.loadMedia(request,
                          this.onMediaDiscovered.bind(this, 'loadMedia'),
                          this.onLoadMediaError.bind(this));
