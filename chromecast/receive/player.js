@@ -151,18 +151,6 @@ example.Player.prototype.load = function(info) {
 };
 
 
-function gvdrequeststream(m) {
-  var streamRequest = new google.ima.cast.StreamRequest();
-  streamRequest.apiKey = '1v6tep0t3q0l59ud1qap9olkbj';
-  streamRequest.assetKey = 'F-Aj4thaSC6yxrLIVITt1A';
-  streamRequest.assetType = google.ima.cast.StreamRequest.AssetType.EVENT;
-  streamRequest.attemptPreroll = true;
-  streamRequest.customParameters = 'bar=0&foo=1';
-  console.log('gvd 0000 streamRequest.apiKey ['+streamRequest.apiKey+']')
-  console.log(streamRequest)
-  m.requestStream(streamRequest);
-}
-
 /**
  * Load stitched ads+video stream.
  *
