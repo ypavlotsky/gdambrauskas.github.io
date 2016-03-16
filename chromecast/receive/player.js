@@ -179,6 +179,9 @@ example.Player.prototype.loadStitchedVideo_ = function(url) {
   });
   var self = this;
   host.processMetadata = function(type, data, timestamp) {
+    // gvd
+    if (true)
+    return;
     console.log("gvd entry for metadata "+String.fromCharCode.apply(null, data))
     self.receiverStreamManager_.processMetadata(type, data, timestamp);
   };
