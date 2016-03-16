@@ -41,15 +41,8 @@ example.Player = function(mediaElement) {
         console.log("gvd lading video with streamUrl0 "+streamUrl + " subtitle "+subtitles)
         var mediaInfo = {};
         mediaInfo.contentId = streamUrl;
-        // gvd mediaInfo.metadata = {};
-        // mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
         mediaInfo.contentType = 'application/x-mpegurl';
         self.loadStitchedVideo_(streamUrl);
-        /*
-         Object
-         streamUrl: "http://truman-qa.sandbox.google.com/ssai/master/event/nSDLa3IJTLCecel2IaECyA/session/05222fd5-aed3-4652-ab43-74077295a810/master.m3u8"subtitles: Array[0]
-         */
-        // gvd self.onReceiverStreamManagerEvent_(),
       },
       false);
   var streamRequest = new google.ima.cast.StreamRequest();
@@ -155,45 +148,6 @@ example.Player.prototype.load = function(info) {
   console.log("gvd info  "+media.customData.foo)
   var contentType = media.contentType;
   console.log("gvd info  contentType "+contentType);
-  // gvdrequeststream(this.receiverStreamManager_)
-  /*
-  var isLiveStream = media.streamType === cast.receiver.media.StreamType.LIVE;
-  if (!media.contentId) {
-    console.log('Load failed: no content');
-  } else if (playerType === example.Type.UNKNOWN) {
-    console.log('Load failed: unknown content type: ' + contentType);
-  } else {
-    console.log('Loading: ' + playerType);
-    self.resetMediaElement_();
-    self.setType_(playerType, isLiveStream);
-    var preloaded = false;
-    console.log("gvd loading video yyyyyyyyyy")
-    preloaded = gvdrequeststream(this.receiverStreamManager_);// gvd self.loadVideo_(info);
-    }
-    self.playerReady_ = false;
-    self.metadataLoaded_ = false;
-    self.showPreviewModeMetadata(false);
-    self.displayPreviewMode_ = false;
-    if (preloaded) {
-      // gvd get rid of preloaded
-
-    } else {
-      example.transition_(self.element_, example.TRANSITION_DURATION_, function() {
-        self.setState_(example.State.LOADING, false);
-        // Only send load completed after we reach this point so the media
-        // manager state is still loading and the sender can't send any PLAY
-        // messages
-        self.playerReady_ = true;
-        self.maybeSendLoadCompleted_(info);
-        if (self.playerAutoPlay_) {
-          // Make sure media info is displayed long enough before playback
-          // starts.
-          self.deferPlay_(example.MEDIA_INFO_DURATION_);
-          self.playerAutoPlay_ = false;
-        }
-      });
-    }
-  }*/
 };
 
 
