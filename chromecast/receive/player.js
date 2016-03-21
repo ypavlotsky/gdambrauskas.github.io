@@ -32,6 +32,8 @@ example.Player = function(mediaElement) {
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
         var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
+        // gvd using alex stream to check if stalling dissapears
+        streamUrl = "http://truman-qa.sandbox.google.com/ssai/event/X2trRZ7lQ_yiyG_ymZHMlA/master.m3u8";
         var subtitles = event.getData().subtitles;
         console.log("gvd lading video with streamUrl0 "+streamUrl + " subtitle "+subtitles)
         var mediaInfo = {};
