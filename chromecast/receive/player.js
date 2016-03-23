@@ -30,6 +30,7 @@ example.Player = function(mediaElement) {
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
+        console.log("gvd  google.ima.cast.StreamEvent.Type.LOADED,")
         var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
         // gvd using alex stream to check if stalling dissapears
         streamUrl = "http://truman-qa.sandbox.google.com/ssai/event/X2trRZ7lQ_yiyG_ymZHMlA/master.m3u8";
@@ -89,7 +90,6 @@ example.Player.prototype.onSenderDisconnected_ = function(event) {
  * @private
  */
 example.Player.prototype.onLoad_ = function(event) {
-  console.log('onLoad_');
   this.load(new cast.receiver.MediaManager.LoadInfo(
       /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data),
       event.senderId));
