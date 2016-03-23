@@ -44,10 +44,10 @@ example.Player = function(mediaElement) {
   this.receiverStreamManager_.addEventListener(
     google.ima.cast.StreamEvent.Type.ERROR,
     function(event) {
+      console.log("got an error: " +event.getData().errorMessage);
       for (var key in event.getData()){
         console.log( key + ": " + event.getData()[key]);
-    }
-      console.log("got an error: " +event.getData().errorMessage);
+      }
     },
     false);
 
