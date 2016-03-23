@@ -134,7 +134,7 @@ Sender.prototype.loadMedia = function() {
   // asset key is required for live streams.
   // streamRequest.assetKey = 'F-Aj4thaSC6yxrLIVITt1A';
   streamRequest.assetKey = 'sN_IYUG8STe1ZzhIIE_ksA';
-  streamRequest.assetType = 'event';
+  streamRequest.streamType = 'event';
   streamRequest.attemptPreroll = false;
   streamRequest.adTagParameters = 'bar=0&foo=1';
   var mediaInfo = new chrome.cast.media.MediaInfo(streamRequest.assetKey);
