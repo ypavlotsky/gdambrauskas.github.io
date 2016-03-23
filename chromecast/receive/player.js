@@ -30,8 +30,9 @@ example.Player = function(mediaElement) {
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
-        console.log("gvd  google.ima.cast.StreamEvent.Type.LOADED,")
+        console.log("gvd  google.ima.cast.StreamEvent.Type.LOADED 0,")
         var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
+        console.log("gvd  google.ima.cast.StreamEvent.Type.LOADED 1,")
         // gvd using alex stream to check if stalling dissapears
         streamUrl = "http://truman-qa.sandbox.google.com/ssai/event/X2trRZ7lQ_yiyG_ymZHMlA/master.m3u8";
         var subtitles = event.getData().subtitles;
