@@ -43,7 +43,9 @@ example.Player = function(mediaElement) {
       false);
   this.receiverStreamManager_.addEventListener(
     google.ima.cast.StreamEvent.Type.ERROR,
-    function(event) { console.log("gvd  error")},
+    function(event) {
+      console.log("got an error: " +event.getData().errorMessage);
+    },
     false);
 
   /**
