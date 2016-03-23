@@ -116,7 +116,8 @@ example.Player.prototype.load = function(info) {
   streamRequest.adTagParameters = media.customData.adTagParameters;
   console.log('received data from the sender, streamType ' +
       streamRequest.streamType);
-  this.receiverStreamManager_.requestStream(streamRequest);
+  // gvd this.receiverStreamManager_.requestStream(streamRequest);
+  this.loadStitchedVideo_('http://truman-qa.sandbox.google.com/ssai/event/X2trRZ7lQ_yiyG_ymZHMlA/master.m3u8')
 };
 
 
