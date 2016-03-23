@@ -102,7 +102,6 @@ example.Player.prototype.onLoad_ = function(event) {
  * @export
  */
 example.Player.prototype.load = function(info) {
-  console.log('received data from the sender');
   var media = info.message.media || {};
   var contentType = media.contentType;
   var streamRequest = new google.ima.cast.StreamRequest();
@@ -110,6 +109,8 @@ example.Player.prototype.load = function(info) {
   streamRequest.streamType = media.customData.streamType;
   streamRequest.attemptPreroll = media.customData.attemptPreroll;
   streamRequest.adTagParameters = media.customData.adTagParameters;
+  console.log('received data from the sender, streamType ' +
+      streamRequest.streamType);
   this.receiverStreamManager_.requestStream(streamRequest);
 };
 
