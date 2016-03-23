@@ -14,7 +14,6 @@ example.Player = function(mediaElement) {
   this.mediaElement_ = mediaElement;
   // cast.receiver.CastReceiverManager
   this.receiverManager_ = cast.receiver.CastReceiverManager.getInstance();
-  this.receiverManager_.onReady = this.onReady_.bind(this);
   this.receiverManager_.onSenderConnected = function(event) {
     console.log('Received Sender Connected event: ' + event.data);
   };
@@ -66,16 +65,6 @@ example.Player.prototype.start = function() {
 };
 
 /**
- * Called when the player is ready. We initialize the UI for the launching
- * and idle screens.
- *
- * @private
- */
-example.Player.prototype.onReady_ = function() {
-  console.log('onReady');
-};
-
-/**
  * Called when a sender disconnects from the app.
  *
  * @param {cast.receiver.CastReceiverManager.SenderDisconnectedEvent} event
@@ -113,6 +102,7 @@ example.Player.prototype.onLoad_ = function(event) {
  * @export
  */
 example.Player.prototype.load = function(info) {
+  console.log('received data from the sender');
   var media = info.message.media || {};
   var contentType = media.contentType;
   var streamRequest = new google.ima.cast.StreamRequest();
