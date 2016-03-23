@@ -117,7 +117,7 @@ example.Player.prototype.load = function(info) {
   var contentType = media.contentType;
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = media.customData.assetKey;
-  streamRequest.assetType = media.customData.assetType;
+  streamRequest.streamType = media.customData.streamType;
   streamRequest.attemptPreroll = media.customData.attemptPreroll;
   streamRequest.adTagParameters = media.customData.adTagParameters;
   this.receiverStreamManager_.requestStream(streamRequest);
