@@ -43,6 +43,10 @@ example.Player = function(mediaElement) {
         self.loadStitchedVideo_(streamUrl);
       },
       false);
+  this.receiverStreamManager_.addEventListener(
+    google.ima.cast.StreamEvent.Type.ERROR,
+    function(event) { console.log("gvd  error")},
+    false);
 
   /**
    * The original load callback.
