@@ -14,7 +14,6 @@ example.Player = function(mediaElement) {
   this.mediaElement_ = mediaElement;
   // cast.receiver.CastReceiverManager
   this.receiverManager_ = cast.receiver.CastReceiverManager.getInstance();
-  this.receiverManager_.onReady = this.onReady_.bind(this);
   this.receiverManager_.onSenderConnected = function(event) {
     console.log('Received Sender Connected event: ' + event.data);
   };
@@ -31,7 +30,9 @@ example.Player = function(mediaElement) {
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
+        console.log("gvd  google.ima.cast.StreamEvent.Type.LOADED 0,")
         var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
+        console.log("gvd  google.ima.cast.StreamEvent.Type.LOADED 1,")
         var subtitles = event.getData().subtitles;
         console.log("gvd lading video with streamUrl0 "+streamUrl + " subtitle "+subtitles)
         var mediaInfo = {};
@@ -40,6 +41,10 @@ example.Player = function(mediaElement) {
         self.loadStitchedVideo_(streamUrl);
       },
       false);
+  this.receiverStreamManager_.addEventListener(
+    google.ima.cast.StreamEvent.Type.ERROR,
+    function(event) { console.log("gvd  error")},
+    false);
 
   /**
    * The original load callback.
@@ -61,16 +66,6 @@ example.Player = function(mediaElement) {
 
 example.Player.prototype.start = function() {
   this.receiverManager_.start();
-};
-
-/**
- * Called when the player is ready. We initialize the UI for the launching
- * and idle screens.
- *
- * @private
- */
-example.Player.prototype.onReady_ = function() {
-  console.log('onReady');
 };
 
 /**
@@ -98,7 +93,6 @@ example.Player.prototype.onSenderDisconnected_ = function(event) {
  * @private
  */
 example.Player.prototype.onLoad_ = function(event) {
-  console.log('onLoad_');
   this.load(new cast.receiver.MediaManager.LoadInfo(
       /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data),
       event.senderId));
@@ -115,9 +109,11 @@ example.Player.prototype.load = function(info) {
   var contentType = media.contentType;
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = media.customData.assetKey;
-  streamRequest.assetType = media.customData.assetType;
+  streamRequest.streamType = media.customData.streamType;
   streamRequest.attemptPreroll = media.customData.attemptPreroll;
   streamRequest.adTagParameters = media.customData.adTagParameters;
+  console.log('received data from the sender, streamType ' +
+      streamRequest.streamType);
   this.receiverStreamManager_.requestStream(streamRequest);
 };
 
@@ -137,12 +133,10 @@ example.Player.prototype.loadStitchedVideo_ = function(url) {
     'mediaElement': this.mediaElement_
   });
   var self = this;
-  /* gvd
   host.processMetadata = function(type, data, timestamp) {
     console.log("gvd entry for metadata "+String.fromCharCode.apply(null, data))
     self.receiverStreamManager_.processMetadata(type, data, timestamp);
   };
-  */
   // gvd host.onError = loadErrorCallback;
   this.player_ = new cast.player.api.Player(host);
   this.player_.load(cast.player.api.CreateHlsStreamingProtocol(host));
