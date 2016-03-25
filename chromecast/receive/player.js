@@ -32,6 +32,9 @@ example.Player = function(mediaElement) {
       function(event) {
         var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
         var subtitles = event.getData().subtitles;
+        for (key in event.getData()){
+          console.log( key + ": " + event[key]);
+      }
         var mediaInfo = {};
         mediaInfo.contentId = streamUrl;
         mediaInfo.contentType = 'application/x-mpegurl';
