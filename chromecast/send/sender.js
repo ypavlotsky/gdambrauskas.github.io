@@ -129,7 +129,7 @@ Sender.prototype.loadMedia = function() {
   }
 
   var streamRequest = {};
-  streamRequest.assetKey = 'NhgU3FcGQriO7exG_AS6fg';
+  streamRequest.assetKey = '0-QkebeWTPmf7FbbxzcHCw';
   streamRequest.streamType = 'event';
   streamRequest.attemptPreroll = false;
   streamRequest.adTagParameters = 'bar=0&foo=1';

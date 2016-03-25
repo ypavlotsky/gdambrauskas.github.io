@@ -30,11 +30,8 @@ example.Player = function(mediaElement) {
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
-        console.log("gvd  google.ima.cast.StreamEvent.Type.LOADED 0,")
         var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
-        console.log("gvd  google.ima.cast.StreamEvent.Type.LOADED 1,")
         var subtitles = event.getData().subtitles;
-        console.log("gvd lading video with streamUrl0 "+streamUrl + " subtitle "+subtitles)
         var mediaInfo = {};
         mediaInfo.contentId = streamUrl;
         mediaInfo.contentType = 'application/x-mpegurl';
