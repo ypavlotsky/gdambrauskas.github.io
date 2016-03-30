@@ -112,11 +112,6 @@ example.Player.prototype.load = function(info) {
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = media.customData.assetKey;
   streamRequest.streamType = media.customData.streamType;
-  // gvd
-  streamRequest.streamType = 'content';
-  streamRequest.contentSourceId = 'contentid';
-  streamRequest.videoId = 'vid';
-
   streamRequest.attemptPreroll = media.customData.attemptPreroll;
   streamRequest.adTagParameters = media.customData.adTagParameters;
   console.log('received data from the sender, streamType ' +
