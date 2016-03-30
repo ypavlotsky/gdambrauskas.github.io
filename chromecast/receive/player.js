@@ -12,6 +12,8 @@ example.Player = function(mediaElement) {
   this.player_ = null;
   // HTMLMediaElement
   this.mediaElement_ = mediaElement;
+  this.mediaElement_.addEventListener('timeupdate', function(){console.log("gvd time")},
+    false);
   // cast.receiver.CastReceiverManager
   this.receiverManager_ = cast.receiver.CastReceiverManager.getInstance();
   this.receiverManager_.onSenderConnected = function(event) {
