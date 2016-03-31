@@ -98,9 +98,10 @@ Player.prototype.load = function(info) {
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = media.customData.assetKey;
   streamRequest.streamType = media.customData.streamType;
-  // gvd
-  streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.CONTENT;
-  console.log("gvd "+streamRequest.streamType)
+  // If the stream is live
+  streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.EVENT;
+  // If it is video on demand, use CONTENT
+  // streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.CONTENT;
   streamRequest.contentSourceId = 'contentid';
   streamRequest.videoId = 'vid';
   streamRequest.attemptPreroll = media.customData.attemptPreroll;
