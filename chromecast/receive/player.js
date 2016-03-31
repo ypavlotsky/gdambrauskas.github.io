@@ -1,6 +1,6 @@
 'use strict';
 
-Player = function(mediaElement) {
+var Player = function(mediaElement) {
   this.castPlayer_ = null;
   this.mediaElement_ = mediaElement;
   cast.player.api.setLoggerLevel(cast.player.api.LoggerLevel.DEBUG);
