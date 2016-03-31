@@ -1,7 +1,7 @@
 'use strict';
 
 Player = function(mediaElement) {
-  this.player_ = null;
+  this.castPlayer_ = null;
   this.mediaElement_ = mediaElement;
   cast.player.api.setLoggerLevel(cast.player.api.LoggerLevel.DEBUG);
   cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
@@ -129,8 +129,8 @@ Player.prototype.onStreamLoaded = function(url) {
     self.receiverStreamManager_.processMetadata(type, data, timestamp);
   };
   // gvd host.onError = loadErrorCallback;
-  this.player_ = new cast.player.api.Player(host);
-  this.player_.load(cast.player.api.CreateHlsStreamingProtocol(host));
+  this.castPlayer_ = new cast.player.api.Player(host);
+  this.castPlayer_.load(cast.player.api.CreateHlsStreamingProtocol(host));
   // gvd this.loadMediaManagerInfo_(info, !!protocolFunc);
 };
 
@@ -154,14 +154,14 @@ Player.prototype.onEditTracksInfo_ = function(event) {
   if (type == 'ttml') {
     // The player_ may not have been created yet if the type of media did
     // not require MPL. It will be lazily created in processTtmlCues_
-//    if (this.player_) {
-//      this.player_.enableCaptions(false, cast.player.api.CaptionsType.TTML);
+//    if (this.castPlayer_) {
+//      this.castPlayer_.enableCaptions(false, cast.player.api.CaptionsType.TTML);
 //    }
 //    this.processTtmlCues_(event.data.activeTrackIds,
 //        mediaInformation.tracks || []);
   } else if (type == 'embedded') {
-//    this.player_.enableCaptions(false);
+//    this.castPlayer_.enableCaptions(false);
 //    this.processInBandTracks_(event.data.activeTrackIds);
-//    this.player_.enableCaptions(true);
+//    this.castPlayer_.enableCaptions(true);
   }
 };
