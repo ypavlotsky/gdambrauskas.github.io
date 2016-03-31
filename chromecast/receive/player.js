@@ -1,52 +1,36 @@
 'use strict';
 
-/**
- * Creates the namespace
- */
-var example = example || {};
-
-example.Player = function(mediaElement) {
+Player = function(mediaElement) {
+  this.player_ = null;
+  this.mediaElement_ = mediaElement;
   cast.player.api.setLoggerLevel(cast.player.api.LoggerLevel.DEBUG);
   cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
-  // cast.player.api.Player
-  this.player_ = null;
-  // HTMLMediaElement
-  this.mediaElement_ = mediaElement;
-  this.mediaElement_.addEventListener('timeupdate', function(){console.log("gvd time")},
-    false);
-  // cast.receiver.CastReceiverManager
   this.receiverManager_ = cast.receiver.CastReceiverManager.getInstance();
   this.receiverManager_.onSenderConnected = function(event) {
-    console.log('Received Sender Connected event: ' + event.data);
+    console.log('Sender Connected');
   };
   this.receiverManager_.onSenderDisconnected =
       this.onSenderDisconnected_.bind(this);
-
-  // cast.receiver.MediaManager
   this.mediaManager_ = new cast.receiver.MediaManager(this.mediaElement_);
-  // google.ima.cast.ReceiverStreamManager
   this.receiverStreamManager_ =
     new google.ima.cast.ReceiverStreamManager(this.mediaElement_,
-                                              this.mediaManager_);
+        this.mediaManager_);
   var self = this;
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
-        var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
+        var streamUrl = event.getData().url;
         var subtitles = event.getData().subtitles;
         var mediaInfo = {};
         mediaInfo.contentId = streamUrl;
         mediaInfo.contentType = 'application/x-mpegurl';
-        self.loadStitchedVideo_(streamUrl);
+        self.onStreamLoaded(streamUrl);
       },
       false);
   this.receiverStreamManager_.addEventListener(
     google.ima.cast.StreamEvent.Type.ERROR,
     function(event) {
-      console.log("got an error: " +event.getData().errorMessage);
-      for (var key in event.getData()){
-        console.log( key + ": " + event.getData()[key]);
-      }
+      console.log("Got an error: " +event.getData().errorMessage);
     },
     false);
 
@@ -68,7 +52,7 @@ example.Player = function(mediaElement) {
 };
 
 
-example.Player.prototype.start = function() {
+Player.prototype.start = function() {
   this.receiverManager_.start();
 };
 
@@ -78,7 +62,7 @@ example.Player.prototype.start = function() {
  * @param {cast.receiver.CastReceiverManager.SenderDisconnectedEvent} event
  * @private
  */
-example.Player.prototype.onSenderDisconnected_ = function(event) {
+Player.prototype.onSenderDisconnected_ = function(event) {
   console.log('onSenderDisconnected');
   // When the last or only sender is connected to a receiver,
   // tapping Disconnect stops the app running on the receiver.
@@ -92,11 +76,11 @@ example.Player.prototype.onSenderDisconnected_ = function(event) {
 /**
  * Called when we receive a LOAD message. Calls load().
  *
- * @see example.Player#load
+ * @see Player#load
  * @param {cast.receiver.MediaManager.Event} event The load event.
  * @private
  */
-example.Player.prototype.onLoad_ = function(event) {
+Player.prototype.onLoad_ = function(event) {
   this.load(new cast.receiver.MediaManager.LoadInfo(
       /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data),
       event.senderId));
@@ -108,21 +92,19 @@ example.Player.prototype.onLoad_ = function(event) {
  * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
  * @export
  */
-example.Player.prototype.load = function(info) {
+Player.prototype.load = function(info) {
   var media = info.message.media || {};
   var contentType = media.contentType;
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = media.customData.assetKey;
   streamRequest.streamType = media.customData.streamType;
   // gvd
-  streamRequest.streamType = 'content';
+  streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.CONTENT;
+  console.log("gvd "+streamRequest.streamType)
   streamRequest.contentSourceId = 'contentid';
   streamRequest.videoId = 'vid';
-
   streamRequest.attemptPreroll = media.customData.attemptPreroll;
   streamRequest.adTagParameters = media.customData.adTagParameters;
-  console.log('received data from the sender, streamType ' +
-      streamRequest.streamType);
   this.receiverStreamManager_.requestStream(streamRequest);
 };
 
@@ -134,8 +116,8 @@ example.Player.prototype.load = function(info) {
  * @return {boolean} Whether the media was preloaded
  * @private
  */
-example.Player.prototype.loadStitchedVideo_ = function(url) {
-  console.log("gvd loadStitchedVideo_");
+Player.prototype.onStreamLoaded = function(url) {
+  console.log("gvd onStreamLoaded");
   var self = this;
   var host = new cast.player.api.Host({
     'url': url,
@@ -158,7 +140,7 @@ example.Player.prototype.loadStitchedVideo_ = function(url) {
  * @param {!cast.receiver.MediaManager.Event} event The editTracksInfo event.
  * @private
  */
-example.Player.prototype.onEditTracksInfo_ = function(event) {
+Player.prototype.onEditTracksInfo_ = function(event) {
   console.log('onEditTracksInfo');
   this.onEditTracksInfoOrig_(event);
 
