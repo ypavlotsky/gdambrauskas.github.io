@@ -20,6 +20,15 @@ var Player = function(mediaElement) {
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
         var streamUrl = event.getData().url;
+        // Each element in subtitles array is an object with url and language
+        // properties. Example of a subtitles array with 2 elements:
+        // {
+        //   "url": "http://www.sis.com/1234/subtitles_en.ttml",
+        //   "language": "en"
+        // }, {
+        //   "url": "http://www.sis.com/1234/subtitles_fr.ttml",
+        //   "language": "fr"
+        // }
         var subtitles = event.getData().subtitles;
         var mediaInfo = {};
         mediaInfo.contentId = streamUrl;
@@ -41,14 +50,6 @@ var Player = function(mediaElement) {
   this.onLoadOrig_ =
       this.mediaManager_.onLoad.bind(this.mediaManager_);
   this.mediaManager_.onLoad = this.onLoad_.bind(this);
-
-  /**
-   * The original editTracksInfo callback
-   * @private {?function(!cast.receiver.MediaManager.Event)}
-   */
-  this.onEditTracksInfoOrig_ =
-      this.mediaManager_.onEditTracksInfo.bind(this.mediaManager_);
-  this.mediaManager_.onEditTracksInfo = this.onEditTracksInfo_.bind(this);
 };
 
 
@@ -101,7 +102,8 @@ Player.prototype.load = function(info) {
   // If the stream is live
   streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.EVENT;
   // If it is video on demand, use CONTENT
-  // streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.CONTENT;
+  // streamRequest.streamType =
+  //     google.ima.cast.StreamRequest.StreamType.CONTENT;
   streamRequest.contentSourceId = 'contentid';
   streamRequest.videoId = 'vid';
   streamRequest.attemptPreroll = media.customData.attemptPreroll;
@@ -114,7 +116,7 @@ Player.prototype.load = function(info) {
  * Load stitched ads+video stream.
  *
  * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
- * @return {boolean} Whether the media was preloaded
+ * @return {boolean} Whether the media was preloaded.
  * @private
  */
 Player.prototype.onStreamLoaded = function(url) {
@@ -132,37 +134,4 @@ Player.prototype.onStreamLoaded = function(url) {
   // gvd host.onError = loadErrorCallback;
   this.castPlayer_ = new cast.player.api.Player(host);
   this.castPlayer_.load(cast.player.api.CreateHlsStreamingProtocol(host));
-  // gvd this.loadMediaManagerInfo_(info, !!protocolFunc);
-};
-
-/**
- * Called when we receive a EDIT_TRACKS_INFO message.
- *
- * @param {!cast.receiver.MediaManager.Event} event The editTracksInfo event.
- * @private
- */
-Player.prototype.onEditTracksInfo_ = function(event) {
-  console.log('onEditTracksInfo');
-  this.onEditTracksInfoOrig_(event);
-
-  // If the captions are embedded or ttml we need to enable/disable tracks
-  // as needed (vtt is processed by the media manager)
-  if (!event.data || !event.data.activeTrackIds || !this.textTrackType_) {
-    return;
-  }
-  var mediaInformation = this.mediaManager_.getMediaInformation() || {};
-  var type = this.textTrackType_;
-  if (type == 'ttml') {
-    // The player_ may not have been created yet if the type of media did
-    // not require MPL. It will be lazily created in processTtmlCues_
-//    if (this.castPlayer_) {
-//      this.castPlayer_.enableCaptions(false, cast.player.api.CaptionsType.TTML);
-//    }
-//    this.processTtmlCues_(event.data.activeTrackIds,
-//        mediaInformation.tracks || []);
-  } else if (type == 'embedded') {
-//    this.castPlayer_.enableCaptions(false);
-//    this.processInBandTracks_(event.data.activeTrackIds);
-//    this.castPlayer_.enableCaptions(true);
-  }
 };
