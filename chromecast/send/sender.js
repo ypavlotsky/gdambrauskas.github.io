@@ -54,7 +54,6 @@ Sender.prototype.onError = function() {
  * @param {!Object} e A new session
  */
 Sender.prototype.sessionListener = function(e) {
-  console.log('gvd session listener')
   if (!this.session) {
     this.session = e;
     this.session.addUpdateListener(this.sessionUpdateListener.bind(this));
@@ -119,8 +118,7 @@ Sender.prototype.onLaunchError = function() {
 };
 
 /**
- * Loads media into a running receiver application
- * @param {Number} mediaIndex An index number to indicate current media content
+ * Loads media into a running receiver application.
  */
 Sender.prototype.loadMedia = function() {
   if (!this.session) {
@@ -130,7 +128,6 @@ Sender.prototype.loadMedia = function() {
 
   var streamRequest = {};
   streamRequest.assetKey = '0-QkebeWTPmf7FbbxzcHCw';
-  streamRequest.streamType = 'event';
   streamRequest.attemptPreroll = false;
   streamRequest.adTagParameters = 'bar=0&foo=1';
   var mediaInfo = new chrome.cast.media.MediaInfo(streamRequest.assetKey);
@@ -143,7 +140,6 @@ Sender.prototype.loadMedia = function() {
   var request = new chrome.cast.media.LoadRequest(mediaInfo);
   request.autoplay = this.autoplay;
   request.currentTime = 0;
-  console.log("gvd session loading media");
   this.session.loadMedia(request,
                          this.onMediaDiscovered.bind(this, 'loadMedia'),
                          this.onLoadMediaError.bind(this));

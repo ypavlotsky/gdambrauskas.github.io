@@ -76,13 +76,11 @@ Player.prototype.onSenderDisconnected_ = function(event) {
  * @private
  */
 Player.prototype.onLoad_ = function(event) {
-  var info = event.data;
-  var media = info.message.media || {};
-  var contentType = media.contentType;
+  var data/* cast.receiver.MediaManager.RequestData */  = event.data || {};
   var streamRequest = new google.ima.cast.StreamRequest();
-  streamRequest.assetKey = media.customData.assetKey;
-  streamRequest.attemptPreroll = media.customData.attemptPreroll;
-  streamRequest.adTagParameters = media.customData.adTagParameters;
+  streamRequest.assetKey = data.customData.assetKey;
+  streamRequest.attemptPreroll = data.customData.attemptPreroll;
+  streamRequest.adTagParameters = data.customData.adTagParameters;
   this.receiverStreamManager_.requestStream(streamRequest);
 };
 
