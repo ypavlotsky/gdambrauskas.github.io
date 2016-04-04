@@ -13,8 +13,7 @@ var Player = function(mediaElement) {
       this.onSenderDisconnected_.bind(this);
   this.mediaManager_ = new cast.receiver.MediaManager(this.mediaElement_);
   this.receiverStreamManager_ =
-    new google.ima.cast.ReceiverStreamManager(this.mediaElement_,
-        this.mediaManager_);
+    new google.ima.cast.ReceiverStreamManager(this.mediaElement_);
   var self = this;
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
@@ -45,7 +44,6 @@ var Player = function(mediaElement) {
 
   /**
    * The original load callback.
-   * @private {?function(cast.receiver.MediaManager.Event)}
    */
   this.onLoadOrig_ =
       this.mediaManager_.onLoad.bind(this.mediaManager_);
@@ -59,9 +57,6 @@ Player.prototype.start = function() {
 
 /**
  * Called when a sender disconnects from the app.
- *
- * @param {cast.receiver.CastReceiverManager.SenderDisconnectedEvent} event
- * @private
  */
 Player.prototype.onSenderDisconnected_ = function(event) {
   console.log('onSenderDisconnected');
@@ -77,35 +72,15 @@ Player.prototype.onSenderDisconnected_ = function(event) {
 /**
  * Called when we receive a LOAD message. Calls load().
  *
- * @see Player#load
  * @param {cast.receiver.MediaManager.Event} event The load event.
  * @private
  */
 Player.prototype.onLoad_ = function(event) {
-  this.load(new cast.receiver.MediaManager.LoadInfo(
-      /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data),
-      event.senderId));
-};
-
-/**
- * Loads the given data. Request comes from sender app.
- *
- * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
- * @export
- */
-Player.prototype.load = function(info) {
+  var info = event.data;
   var media = info.message.media || {};
   var contentType = media.contentType;
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = media.customData.assetKey;
-  streamRequest.streamType = media.customData.streamType;
-  // If the stream is live
-  streamRequest.streamType = google.ima.cast.StreamRequest.StreamType.EVENT;
-  // If it is video on demand, use CONTENT
-  // streamRequest.streamType =
-  //     google.ima.cast.StreamRequest.StreamType.CONTENT;
-  streamRequest.contentSourceId = 'contentid';
-  streamRequest.videoId = 'vid';
   streamRequest.attemptPreroll = media.customData.attemptPreroll;
   streamRequest.adTagParameters = media.customData.adTagParameters;
   this.receiverStreamManager_.requestStream(streamRequest);
@@ -113,14 +88,9 @@ Player.prototype.load = function(info) {
 
 
 /**
- * Load stitched ads+video stream.
- *
- * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
- * @return {boolean} Whether the media was preloaded.
- * @private
+ * Loads stitched ads+content stream.
  */
 Player.prototype.onStreamLoaded = function(url) {
-  console.log("gvd onStreamLoaded");
   var self = this;
   var host = new cast.player.api.Host({
     'url': url,
@@ -128,10 +98,8 @@ Player.prototype.onStreamLoaded = function(url) {
   });
   var self = this;
   host.processMetadata = function(type, data, timestamp) {
-    console.log("gvd entry for metadata "+String.fromCharCode.apply(null, data))
     self.receiverStreamManager_.processMetadata(type, data, timestamp);
   };
-  // gvd host.onError = loadErrorCallback;
   this.castPlayer_ = new cast.player.api.Player(host);
   this.castPlayer_.load(cast.player.api.CreateHlsStreamingProtocol(host));
 };
