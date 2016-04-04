@@ -84,10 +84,11 @@ Player.prototype.onLoad_ = function(event) {
   for(var key in data.media) {
     console.log("gvd key "+key+ " "+data.media[key])
   }
+  var imaRequestData = data.media.customData;
   var streamRequest = new google.ima.cast.StreamRequest();
-  streamRequest.assetKey = data.customData.assetKey;
-  streamRequest.attemptPreroll = data.customData.attemptPreroll;
-  streamRequest.adTagParameters = data.customData.adTagParameters;
+  streamRequest.assetKey = imaRequestData.assetKey;
+  streamRequest.attemptPreroll = imaRequestData.attemptPreroll;
+  streamRequest.adTagParameters = imaRequestData.adTagParameters;
   this.receiverStreamManager_.requestStream(streamRequest);
 };
 
