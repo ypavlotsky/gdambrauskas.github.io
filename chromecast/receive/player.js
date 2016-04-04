@@ -80,6 +80,10 @@ Player.prototype.onLoad_ = function(event) {
   for(var key in data) {
     console.log("gvd key "+key+ " "+data[key])
   }
+
+  for(var key in data.media) {
+    console.log("gvd key "+key+ " "+data.media[key])
+  }
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = data.customData.assetKey;
   streamRequest.attemptPreroll = data.customData.attemptPreroll;
