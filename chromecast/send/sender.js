@@ -35,6 +35,7 @@ Sender.prototype.initializeSender = function() {
                          this.onError.bind(this));
 };
 
+
 /**
  * Callback function for init success
  */
@@ -43,6 +44,7 @@ Sender.prototype.onInitSuccess = function() {
   this.launchApp();
 };
 
+
 /**
  * Generic error callback function
  */
@@ -50,9 +52,7 @@ Sender.prototype.onError = function() {
   console.log('error');
 };
 
-/**
- * @param {!Object} e A new session
- */
+
 Sender.prototype.sessionListener = function(e) {
   if (!this.session) {
     this.session = e;
@@ -83,6 +83,7 @@ Sender.prototype.receiverListener = function(e) {
   }
 };
 
+
 /**
  * Session update listener
  */
@@ -110,12 +111,14 @@ Sender.prototype.launchApp = function() {
   }
 };
 
+
 /**
  * Callback function for launch error
  */
 Sender.prototype.onLaunchError = function() {
   console.log('launch error');
 };
+
 
 /**
  * Loads media into a running receiver application.
@@ -145,13 +148,14 @@ Sender.prototype.loadMedia = function() {
                          this.onLoadMediaError.bind(this));
 };
 
+
 /**
- * Callback function for loadMedia success
- * @param {Object} mediaSession A new media object.
+ * Callback function for loadMedia success.
  */
 Sender.prototype.onMediaDiscovered = function(how, mediaSession) {
   this.currentMediaSession = mediaSession;
 };
+
 
 /**
  * Callback function when media load returns error

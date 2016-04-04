@@ -47,7 +47,7 @@ var Player = function(mediaElement) {
    */
   this.onLoadOrig_ =
       this.mediaManager_.onLoad.bind(this.mediaManager_);
-  this.mediaManager_.onLoad = this.onLoad_.bind(this);
+  this.mediaManager_.onLoad = this.onLoad.bind(this);
 };
 
 
@@ -70,21 +70,10 @@ Player.prototype.onSenderDisconnected_ = function(event) {
 };
 
 /**
- * Called when we receive a LOAD message. Calls load().
- *
- * @param {cast.receiver.MediaManager.Event} event The load event.
- * @private
+ * Called when we receive a LOAD message from the sender.
  */
-Player.prototype.onLoad_ = function(event) {
-  var data/* cast.receiver.MediaManager.RequestData */  = event.data || {};
-  for(var key in data) {
-    console.log("gvd key "+key+ " "+data[key])
-  }
-
-  for(var key in data.media) {
-    console.log("gvd key "+key+ " "+data.media[key])
-  }
-  var imaRequestData = data.media.customData;
+Player.prototype.onLoad = function(event) {
+  var imaRequestData = event.data.media.customData;
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = imaRequestData.assetKey;
   streamRequest.attemptPreroll = imaRequestData.attemptPreroll;
