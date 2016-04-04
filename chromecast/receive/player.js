@@ -77,6 +77,9 @@ Player.prototype.onSenderDisconnected_ = function(event) {
  */
 Player.prototype.onLoad_ = function(event) {
   var data/* cast.receiver.MediaManager.RequestData */  = event.data || {};
+  for(var key in data) {
+    console.log("gvd key "+key+ " "+data[key])
+  }
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = data.customData.assetKey;
   streamRequest.attemptPreroll = data.customData.attemptPreroll;
