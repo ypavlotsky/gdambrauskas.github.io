@@ -159,7 +159,7 @@ Sender.prototype.onMediaDiscovered = function(how, mediaSession) {
  * Callback function when media load returns error
  */
 Sender.prototype.onLoadMediaError = function(e) {
-  console.log('media error');
+  console.log('media error: ' + e);
 };
 
 
