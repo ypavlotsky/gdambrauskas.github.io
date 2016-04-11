@@ -138,6 +138,7 @@ Sender.prototype.loadMedia = function() {
   streamRequest.adTagParameters = Sender.SAMPLE_AD_TAG_PARAMS;
   var mediaInfo = new chrome.cast.media.MediaInfo(streamRequest.assetKey);
   mediaInfo.customData = streamRequest;
+  mediaInfo.contentType = 'application/x-mpegurl';
 
   var request = new chrome.cast.media.LoadRequest(mediaInfo);
   request.currentTime = 0;
@@ -158,8 +159,8 @@ Sender.prototype.onMediaDiscovered = function(how, mediaSession) {
 /**
  * Callback function when media load returns error
  */
-Sender.prototype.onLoadMediaError = function(e) {
-  console.log('media error: ' + e);
+Sender.prototype.onLoadMediaError = function(e/*chrome.cast.Error*/) {
+  console.log('media error: ' + e.code + " " +e.description);
 };
 
 
