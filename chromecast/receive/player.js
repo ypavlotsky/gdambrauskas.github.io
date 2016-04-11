@@ -1,20 +1,24 @@
 'use strict';
 
+/**
+ * Entry point for the sample video player which uses media element for
+ * rendering video streams.
+ *
+ * @param {!HTMLMediaElement} mediaElement for video rendering.
+ */
 var Player = function(mediaElement) {
   this.castPlayer_ = null;
   this.mediaElement_ = mediaElement;
-  cast.player.api.setLoggerLevel(cast.player.api.LoggerLevel.DEBUG);
-  cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
   this.receiverManager_ = cast.receiver.CastReceiverManager.getInstance();
   this.receiverManager_.onSenderConnected = function(event) {
     console.log('Sender Connected');
   };
   this.receiverManager_.onSenderDisconnected =
-      this.onSenderDisconnected_.bind(this);
+      this.onSenderDisconnected.bind(this);
   this.mediaManager_ = new cast.receiver.MediaManager(this.mediaElement_);
   this.receiverStreamManager_ =
-    new google.ima.cast.ReceiverStreamManager(this.mediaElement_);
-  var self = this;
+      new google.ima.cast.ReceiverStreamManager(this.mediaElement_);
+  this.onStreamDataReceived = this.onStreamDataReceived.bind(this);
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
@@ -32,33 +36,31 @@ var Player = function(mediaElement) {
         var mediaInfo = {};
         mediaInfo.contentId = streamUrl;
         mediaInfo.contentType = 'application/x-mpegurl';
-        self.onStreamLoaded(streamUrl);
+        this.onStreamDataReceived(streamUrl);
       },
       false);
   this.receiverStreamManager_.addEventListener(
-    google.ima.cast.StreamEvent.Type.ERROR,
-    function(event) {
-      console.log("Got an error: " +event.getData().errorMessage);
-    },
-    false);
-
-  /**
-   * The original load callback.
-   */
-  this.onLoadOrig_ =
-      this.mediaManager_.onLoad.bind(this.mediaManager_);
+      google.ima.cast.StreamEvent.Type.ERROR,
+      function(event) {
+        console.log("Got an error: " +event.getData().errorMessage);
+      },
+      false);
   this.mediaManager_.onLoad = this.onLoad.bind(this);
 };
 
 
+/**
+ * Starts receiver manager which tracks playback of the stream.
+ */
 Player.prototype.start = function() {
   this.receiverManager_.start();
 };
 
 /**
  * Called when a sender disconnects from the app.
+ * @param {cast.receiver.CastReceiverManager.SenderDisconnectedEvent} event
  */
-Player.prototype.onSenderDisconnected_ = function(event) {
+Player.prototype.onSenderDisconnected = function(event) {
   console.log('onSenderDisconnected');
   // When the last or only sender is connected to a receiver,
   // tapping Disconnect stops the app running on the receiver.
@@ -71,6 +73,7 @@ Player.prototype.onSenderDisconnected_ = function(event) {
 
 /**
  * Called when we receive a LOAD message from the sender.
+ * @param {!cast.receiver.MediaManager.Event} event The load event.
  */
 Player.prototype.onLoad = function(event) {
   var imaRequestData = event.data.media.customData;
@@ -84,8 +87,9 @@ Player.prototype.onLoad = function(event) {
 
 /**
  * Loads stitched ads+content stream.
+ * @param {!string} url of the stream.
  */
-Player.prototype.onStreamLoaded = function(url) {
+Player.prototype.onStreamDataReceived = function(url) {
   var self = this;
   var host = new cast.player.api.Host({
     'url': url,
