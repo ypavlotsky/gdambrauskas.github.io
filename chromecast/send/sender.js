@@ -13,7 +13,7 @@ var Sender = function() {
 
 
 //Sender.SAMPLE_ASSET_KEY = '0-QkebeWTPmf7FbbxzcHCw';
-Sender.SAMPLE_ASSET_KEY = 'XtYsba8UTluCIhWMR8Zydg';
+Sender.SAMPLE_ASSET_KEY = '0-QkebeWTPmf7FbbxzcHCw';
 Sender.SAMPLE_AD_TAG_PARAMS = 'bar=0&foo=1';
 
 
