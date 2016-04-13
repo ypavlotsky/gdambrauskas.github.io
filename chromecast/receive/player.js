@@ -18,8 +18,8 @@ var Player = function(mediaElement) {
   this.mediaManager_ = new cast.receiver.MediaManager(this.mediaElement_);
   this.receiverStreamManager_ =
       new google.ima.cast.ReceiverStreamManager(this.mediaElement_);
-  //var onStreamDataReceived = this.onStreamDataReceived.bind(this);
-  this.onStreamDataReceived = this.onStreamDataReceived.bind(this);
+  var onStreamDataReceived = this.onStreamDataReceived.bind(this);
+  //this.onStreamDataReceived = this.onStreamDataReceived.bind(this);
   this.receiverStreamManager_.addEventListener(
       google.ima.cast.StreamEvent.Type.LOADED,
       function(event) {
@@ -37,7 +37,7 @@ var Player = function(mediaElement) {
         var mediaInfo = {};
         mediaInfo.contentId = streamUrl;
         mediaInfo.contentType = 'application/x-mpegurl';
-        this.onStreamDataReceived(streamUrl);
+        onStreamDataReceived(streamUrl);
       },
       false);
   this.receiverStreamManager_.addEventListener(
