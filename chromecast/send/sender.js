@@ -28,7 +28,7 @@ Sender.prototype.initializeSender = function() {
     setTimeout(this.initializeSender.bind(this), 1000);
     return;
   }
-  var applicationID = '090D48C1';// gvd 'BC48F4DE';
+  var applicationID = 'BC48F4DE';
   var autoJoinPolicy = chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED;
   var sessionRequest = new chrome.cast.SessionRequest(applicationID);
   var apiConfig =new chrome.cast.ApiConfig(sessionRequest,
