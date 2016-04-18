@@ -118,8 +118,8 @@ Sender.prototype.launchApp = function() {
 /**
  * Callback function for launch error
  */
-Sender.prototype.onLaunchError = function(e/*chrome.cast.Error*/) {
-  console.log('media error: ' + e.code + " " +e.description);
+Sender.prototype.onLaunchError = function() {
+  console.log('launch error');
 };
 
 

@@ -46,7 +46,6 @@ var Player = function(mediaElement) {
       },
       false);
   this.mediaManager_.onLoad = this.onLoad.bind(this);
-  console.log("gvd 1")
 };
 
 
