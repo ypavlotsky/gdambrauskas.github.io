@@ -12,9 +12,8 @@ var Sender = function() {
 };
 
 
-//Sender.SAMPLE_ASSET_KEY = '0-QkebeWTPmf7FbbxzcHCw';
 Sender.SAMPLE_ASSET_KEY = '0-QkebeWTPmf7FbbxzcHCw';
-Sender.SAMPLE_AD_TAG_PARAMS = 'bar=0&foo=1';
+Sender.SAMPLE_AD_TAG_PARAMS = {bar: 0, foo: 1};
 
 
 /**
@@ -119,8 +118,8 @@ Sender.prototype.launchApp = function() {
 /**
  * Callback function for launch error
  */
-Sender.prototype.onLaunchError = function(e) {
-  console.log('launch error ' + e.code + " " + e.description);
+Sender.prototype.onLaunchError = function() {
+  console.log('launch error');
 };
 
 
@@ -138,7 +137,6 @@ Sender.prototype.loadMedia = function() {
   streamRequest.attemptPreroll = false;
   streamRequest.adTagParameters = Sender.SAMPLE_AD_TAG_PARAMS;
   var mediaInfo = new chrome.cast.media.MediaInfo(streamRequest.assetKey);
-
   mediaInfo.customData = streamRequest;
   mediaInfo.contentType = 'application/x-mpegurl';
 
