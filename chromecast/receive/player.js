@@ -79,6 +79,7 @@ Player.prototype.onLoad = function(event) {
   var imaRequestData = event.data.media.customData;
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = imaRequestData.assetKey;
+  streamRequest.apiKey = imaRequestData.apiKey;
   streamRequest.attemptPreroll = imaRequestData.attemptPreroll;
   streamRequest.adTagParameters = imaRequestData.adTagParameters;
   this.receiverStreamManager_.requestStream(streamRequest);
