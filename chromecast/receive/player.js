@@ -76,13 +76,11 @@ Player.prototype.onSenderDisconnected = function(event) {
  * @param {!cast.receiver.MediaManager.Event} event The load event.
  */
 Player.prototype.onLoad = function(event) {
-  console.log("gvd onload")
   var imaRequestData = event.data.media.customData;
   var streamRequest = new google.ima.cast.StreamRequest();
   streamRequest.assetKey = imaRequestData.assetKey;
   streamRequest.attemptPreroll = imaRequestData.attemptPreroll;
   streamRequest.adTagParameters = imaRequestData.adTagParameters;
-  console.log("gvd onload about to request stream")
   this.receiverStreamManager_.requestStream(streamRequest);
 };
 
