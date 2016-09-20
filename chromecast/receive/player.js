@@ -1,182 +1,205 @@
 'use strict';
 
 /**
- * Creates the namespace
+ * Creates new player for video and ad playback.
+ * @param {cast.receiver.MediaManager} mediaElement The video element.
  */
-var example = example || {};
-
-example.Player = function(mediaElement) {
-  cast.player.api.setLoggerLevel(cast.player.api.LoggerLevel.DEBUG);
-  cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
-  // cast.player.api.Player
-  this.player_ = null;
-  // HTMLMediaElement
+var Player = function(mediaElement) {
+  var namespace = 'urn:x-cast:com.google.ads.ima.cast';
   this.mediaElement_ = mediaElement;
-  // cast.receiver.CastReceiverManager
-  this.receiverManager_ = cast.receiver.CastReceiverManager.getInstance();
-  this.receiverManager_.onReady = this.onReady_.bind(this);
-  this.receiverManager_.onSenderConnected = function(event) {
-    console.log('Received Sender Connected event: ' + event.data);
-  };
-  this.receiverManager_.onSenderDisconnected =
-      this.onSenderDisconnected_.bind(this);
-
-  // cast.receiver.MediaManager
   this.mediaManager_ = new cast.receiver.MediaManager(this.mediaElement_);
-  // google.ima.cast.ReceiverStreamManager
-  this.receiverStreamManager_ =
-    new google.ima.cast.ReceiverStreamManager(this.mediaElement_,
-                                              this.mediaManager_);
+  this.castReceiverManager_ = cast.receiver.CastReceiverManager.getInstance();
+  this.imaMessageBus_ = this.castReceiverManager_.getCastMessageBus(namespace);
+  this.castReceiverManager_.start();
+
+  this.originalOnLoad_ = this.mediaManager_.onLoad.bind(this.mediaManager_);
+  this.originalOnEnded_ = this.mediaManager_.onEnded.bind(this.mediaManager_);
+  this.originalOnSeek_ = this.mediaManager_.onSeek.bind(this.mediaManager_);
+
+  this.setupCallbacks_();
+};
+
+/**
+ * Attaches necessary callbacks.
+ * @private
+ */
+Player.prototype.setupCallbacks_ = function() {
   var self = this;
-  this.receiverStreamManager_.addEventListener(
-      google.ima.cast.StreamEvent.Type.LOADED,
-      function(event) {
-        var streamUrl = event.getData().url;// gvd check fields in this, better to expose as public api etc
-        var subtitles = event.getData().subtitles;
-        console.log("gvd lading video with streamUrl0 "+streamUrl + " subtitle "+subtitles)
-        var mediaInfo = {};
-        mediaInfo.contentId = streamUrl;
-        mediaInfo.contentType = 'application/x-mpegurl';
-        self.loadStitchedVideo_(streamUrl);
-      },
-      false);
 
-  /**
-   * The original load callback.
-   * @private {?function(cast.receiver.MediaManager.Event)}
-   */
-  this.onLoadOrig_ =
-      this.mediaManager_.onLoad.bind(this.mediaManager_);
-  this.mediaManager_.onLoad = this.onLoad_.bind(this);
-
-  /**
-   * The original editTracksInfo callback
-   * @private {?function(!cast.receiver.MediaManager.Event)}
-   */
-  this.onEditTracksInfoOrig_ =
-      this.mediaManager_.onEditTracksInfo.bind(this.mediaManager_);
-  this.mediaManager_.onEditTracksInfo = this.onEditTracksInfo_.bind(this);
-};
-
-
-example.Player.prototype.start = function() {
-  this.receiverManager_.start();
-};
-
-/**
- * Called when the player is ready. We initialize the UI for the launching
- * and idle screens.
- *
- * @private
- */
-example.Player.prototype.onReady_ = function() {
-  console.log('onReady');
-};
-
-/**
- * Called when a sender disconnects from the app.
- *
- * @param {cast.receiver.CastReceiverManager.SenderDisconnectedEvent} event
- * @private
- */
-example.Player.prototype.onSenderDisconnected_ = function(event) {
-  console.log('onSenderDisconnected');
-  // When the last or only sender is connected to a receiver,
-  // tapping Disconnect stops the app running on the receiver.
-  if (this.receiverManager_.getSenders().length === 0 &&
-      event.reason ===
-          cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
-    this.receiverManager_.stop();
-  }
-};
-
-/**
- * Called when we receive a LOAD message. Calls load().
- *
- * @see example.Player#load
- * @param {cast.receiver.MediaManager.Event} event The load event.
- * @private
- */
-example.Player.prototype.onLoad_ = function(event) {
-  console.log('onLoad_');
-  this.load(new cast.receiver.MediaManager.LoadInfo(
-      /** @type {!cast.receiver.MediaManager.LoadRequestData} */ (event.data),
-      event.senderId));
-};
-
-/**
- * Loads the given data. Request comes from sender app.
- *
- * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
- * @export
- */
-example.Player.prototype.load = function(info) {
-  var media = info.message.media || {};
-  var contentType = media.contentType;
-  var streamRequest = new google.ima.cast.StreamRequest();
-  streamRequest.assetKey = media.customData.assetKey;
-  streamRequest.assetType = media.customData.assetType;
-  streamRequest.attemptPreroll = media.customData.attemptPreroll;
-  streamRequest.adTagParameters = media.customData.adTagParameters;
-  this.receiverStreamManager_.requestStream(streamRequest);
-};
-
-
-/**
- * Load stitched ads+video stream.
- *
- * @param {!cast.receiver.MediaManager.LoadInfo} info The load request info.
- * @return {boolean} Whether the media was preloaded
- * @private
- */
-example.Player.prototype.loadStitchedVideo_ = function(url) {
-  console.log("gvd loadStitchedVideo_");
-  var self = this;
-  var host = new cast.player.api.Host({
-    'url': url,
-    'mediaElement': this.mediaElement_
-  });
-  var self = this;
-  /* gvd
-  host.processMetadata = function(type, data, timestamp) {
-    console.log("gvd entry for metadata "+String.fromCharCode.apply(null, data))
-    self.receiverStreamManager_.processMetadata(type, data, timestamp);
+  // Chromecast device is disconnected from sender app.
+  this.castReceiverManager_.onSenderDisconnected = function() {
+    window.close();
   };
-  */
-  // gvd host.onError = loadErrorCallback;
-  this.player_ = new cast.player.api.Player(host);
-  this.player_.load(cast.player.api.CreateHlsStreamingProtocol(host));
-  // gvd this.loadMediaManagerInfo_(info, !!protocolFunc);
+
+  // Receives messages from sender app. The message is a comma separated string
+  // where the first substring indicates the function to be called and the
+  // following substrings are the parameters to be passed to the function.
+  this.imaMessageBus_.onMessage = function(event) {
+    console.log(event.data);
+    var message = event.data.split(',');
+    var method = message[0];
+    switch (method) {
+      case 'requestAd':
+        var adTag = message[1];
+        var currentTime = parseFloat(message[2]);
+        self.requestAd_(adTag, currentTime);
+        break;
+      case 'seek':
+        var time = parseFloat(message[1]);
+        self.seek_(time);
+        break;
+      default:
+        self.broadcast_('Message not recognized');
+        break;
+    }
+  };
+
+  // Initializes IMA SDK when Media Manager is loaded.
+  this.mediaManager_.onLoad = function(event) {
+    self.originalOnLoadEvent_ = event;
+    self.initIMA_();
+    self.originalOnLoad_(self.originalOnLoadEvent_);
+  };
 };
 
 /**
- * Called when we receive a EDIT_TRACKS_INFO message.
- *
- * @param {!cast.receiver.MediaManager.Event} event The editTracksInfo event.
+ * Sends messages to all connected sender apps.
+ * @param {!string} message Message to be sent to senders.
  * @private
  */
-example.Player.prototype.onEditTracksInfo_ = function(event) {
-  console.log('onEditTracksInfo');
-  this.onEditTracksInfoOrig_(event);
+Player.prototype.broadcast_ = function(message) {
+  this.imaMessageBus_.broadcast(message);
+};
 
-  // If the captions are embedded or ttml we need to enable/disable tracks
-  // as needed (vtt is processed by the media manager)
-  if (!event.data || !event.data.activeTrackIds || !this.textTrackType_) {
-    return;
+/**
+ * Creates new AdsLoader and adds listeners.
+ * @private
+ */
+Player.prototype.initIMA_ = function() {
+  this.currentContentTime_ = 0;
+  var adDisplayContainer = new google.ima.AdDisplayContainer(
+      document.getElementById('adContainer'), this.mediaElement_);
+  adDisplayContainer.initialize();
+  this.adsLoader_ = new google.ima.AdsLoader(adDisplayContainer);
+  this.adsLoader_.addEventListener(
+      google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+      this.onAdsManagerLoaded_.bind(this), false);
+  this.adsLoader_.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR,
+      this.onAdError_.bind(this), false);
+  this.adsLoader_.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED,
+      this.onAllAdsCompleted_.bind(this), false);
+};
+
+/**
+ * Sends AdsManager playAdsAfterTime if starting in the middle of content and
+ * starts AdsManager.
+ * @param {ima.AdsManagerLoadedEvent} adsManagerLoadedEvent The loaded event.
+ * @private
+ */
+Player.prototype.onAdsManagerLoaded_ = function(adsManagerLoadedEvent) {
+  var adsRenderingSettings = new google.ima.AdsRenderingSettings();
+  adsRenderingSettings.playAdsAfterTime = this.currentContentTime_;
+
+  console.log(this.mediaElement_);
+  // Get the ads manager.
+  this.adsManager_ = adsManagerLoadedEvent.getAdsManager(
+    this.mediaElement_, adsRenderingSettings);
+
+  // Add listeners to the required events.
+  this.adsManager_.addEventListener(
+      google.ima.AdErrorEvent.Type.AD_ERROR,
+      this.onAdError_.bind(this));
+  this.adsManager_.addEventListener(
+      google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED,
+      this.onContentPauseRequested_.bind(this));
+  this.adsManager_.addEventListener(
+      google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED,
+      this.onContentResumeRequested_.bind(this));
+
+  try {
+    this.adsManager_.init(this.mediaElement_.width, this.mediaElement_.height,
+        google.ima.ViewMode.FULLSCREEN);
+    this.adsManager_.start();
+  } catch (adError) {
+    // An error may be thrown if there was a problem with the VAST response.
+    this.broadcast_('Ads Manager Error: ' + adError.getMessage());
   }
-  var mediaInformation = this.mediaManager_.getMediaInformation() || {};
-  var type = this.textTrackType_;
-  if (type == 'ttml') {
-    // The player_ may not have been created yet if the type of media did
-    // not require MPL. It will be lazily created in processTtmlCues_
-//    if (this.player_) {
-//      this.player_.enableCaptions(false, cast.player.api.CaptionsType.TTML);
-//    }
-//    this.processTtmlCues_(event.data.activeTrackIds,
-//        mediaInformation.tracks || []);
-  } else if (type == 'embedded') {
-//    this.player_.enableCaptions(false);
-//    this.processInBandTracks_(event.data.activeTrackIds);
-//    this.player_.enableCaptions(true);
+};
+
+/**
+ * Handles errors from AdsLoader and AdsManager.
+ * @param {ima.AdErrorEvent} adErrorEvent error
+ * @private
+ */
+Player.prototype.onAdError_ = function(adErrorEvent) {
+  this.broadcast_('Ad Error: ' + adErrorEvent.getError().toString());
+  // Handle the error logging.
+  if (this.adsManager_) {
+    this.adsManager_.destroy();
   }
+  this.mediaElement_.play();
+};
+
+/**
+ * When content is paused by AdsManager to start playing an ad.
+ * @private
+ */
+Player.prototype.onContentPauseRequested_ = function() {
+  this.currentContentTime_ = this.mediaElement_.currentTime;
+  this.broadcast_('onContentPauseRequested,' + this.currentContentTime_);
+  this.mediaManager_.onEnded = function(event) {};
+  this.mediaManager_.onSeek = function(event) {};
+};
+
+/**
+ * When an ad finishes playing and AdsManager resumes content.
+ * @private
+ */
+Player.prototype.onContentResumeRequested_ = function() {
+  this.broadcast_('onContentResumeRequested');
+  this.mediaManager_.onEnded = this.originalOnEnded_.bind(this.mediaManager_);
+  this.mediaManager_.onSeek = this.originalOnSeek_.bind(this.mediaManager_);
+
+  this.originalOnLoad_(this.originalOnLoadEvent_);
+  this.seek_(this.currentContentTime_);
+};
+
+/**
+ * Destroys AdsManager when all requested ads have finished playing.
+ * @private
+ */
+Player.prototype.onAllAdsCompleted_ = function() {
+  if (this.adsManager_) {
+    this.adsManager_.destroy();
+  }
+};
+
+/**
+ * Sets time video should seek to when content resumes and requests ad tag.
+ * @param {!string} adTag ad tag to be requested.
+ * @param {!float} currentTime time of content video we should resume from.
+ * @private
+ */
+Player.prototype.requestAd_ = function(adTag, currentTime) {
+  if (currentTime != 0) {
+    this.currentContentTime_ = currentTime;
+  }
+  var adsRequest = new google.ima.AdsRequest();
+  adsRequest.adTagUrl = adTag;
+  adsRequest.linearAdSlotWidth = this.mediaElement_.width;
+  adsRequest.linearAdSlotHeight = this.mediaElement_.height;
+  adsRequest.nonLinearAdSlotWidth = this.mediaElement_.width;
+  adsRequest.nonLinearAdSlotHeight = this.mediaElement_.height / 3;
+  this.adsLoader_.requestAds(adsRequest);
+};
+
+/**
+ * Seeks content video.
+ * @param {!float} time time to seek to.
+ * @private
+ */
+Player.prototype.seek_ = function(time) {
+  this.currentContentTime_ = time;
+  this.mediaElement_.currentTime = time;
+  this.mediaElement_.play();
 };
